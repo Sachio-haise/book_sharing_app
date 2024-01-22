@@ -5,11 +5,11 @@ class InputFormWidget extends StatefulWidget {
     super.key,
     required this.controller,
     required this.hintText,
-    required this.errorText
+    required this.validateText
   });
 
   final String hintText;
-  final String errorText;
+  final String validateText;
   final TextEditingController controller;
 
   @override
@@ -19,25 +19,34 @@ class InputFormWidget extends StatefulWidget {
 class _InputFormWidgetState extends State<InputFormWidget> {
   @override
   Widget build(BuildContext context) {
-    return TextFormField(
-      autofocus: true,
-      controller: widget.controller,
-      decoration:    InputDecoration(
-        labelText: widget.hintText,
-        focusColor: Colors.green,
-        floatingLabelStyle: const TextStyle(
-            color: Colors.green
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        TextFormField(
+          autofocus: true,
+          controller: widget.controller,
+          decoration:    InputDecoration(
+            labelText: widget.hintText,
+            focusColor: Colors.green,
+            floatingLabelStyle: const TextStyle(
+                color: Colors.green
+            ),
+            focusedBorder: const UnderlineInputBorder(
+              borderSide: BorderSide(color: Colors.green), // Set the underline color
+            ),
+            focusedErrorBorder: const UnderlineInputBorder(
+              borderSide: BorderSide(color: Colors.red), // Set the underline color when there is an error
+            ),
+          ),
         ),
-        focusedBorder: const UnderlineInputBorder(
-          borderSide: BorderSide(color: Colors.green), // Set the underline color
+        Text(
+          widget.validateText,
+          style: const TextStyle(
+            color: Colors.red,
+            fontSize:  12.0
+          ),
         ),
-        focusedErrorBorder: const UnderlineInputBorder(
-          borderSide: BorderSide(color: Colors.red), // Set the underline color when there is an error
-        ),
-      ),
-      validator: (value) => value != null && value.isEmpty
-          ? widget.errorText
-          : null,
+      ],
     );
   }
 }
