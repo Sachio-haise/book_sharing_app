@@ -1,5 +1,5 @@
 import 'package:book_sharing_app/pages/home.dart';
-import 'package:book_sharing_app/pages/register.dart';
+import 'package:book_sharing_app/pages/auth.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -20,7 +20,7 @@ class MyApp extends StatelessWidget {
       initialRoute: "/",
       getPages: [
         GetPage(name: '/', page: () => HomePage()),
-        GetPage(name: '/register', page: () => RegisterPage()),
+        GetPage(name: '/auth', page: () => AuthPage()),
       ],
     );
   }

@@ -1,4 +1,4 @@
-import 'package:book_sharing_app/pages/register.dart';
+import 'package:book_sharing_app/pages/auth.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -33,7 +33,7 @@ class _HomePageState extends State<HomePage> {
             padding:const EdgeInsets.only(right: 16.0,top: 8.0),
             child: InkWell(
               onTap: () {
-                Get.to(RegisterPage());
+                Get.to(AuthPage());
               },
               child: const CircleAvatar(
                 radius: 20,
