@@ -1,4 +1,8 @@
+import 'dart:async';
+
+import 'package:book_sharing_app/controller/auth_controller.dart';
 import 'package:book_sharing_app/pages/auth.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -11,6 +15,21 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   int currentPageIndex = 0;
+  String? _token;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadToken();
+  }
+
+  Future<void> _loadToken() async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    final String? token = prefs.getString('token');
+    setState(() {
+      _token = token; // No need for null check here
+    });
+  }
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -33,7 +52,11 @@ class _HomePageState extends State<HomePage> {
             padding:const EdgeInsets.only(right: 16.0,top: 8.0),
             child: InkWell(
               onTap: () {
-                Get.to(AuthPage());
+                if (_token != null && _token!.isNotEmpty) {
+                  Get.offAllNamed('/profile');
+                } else {
+                  Get.toNamed('/profile');
+                }
               },
               child: const CircleAvatar(
                 radius: 20,
@@ -71,7 +94,9 @@ class _HomePageState extends State<HomePage> {
               label: 'Profile'
           ),
         ],
-      )
+      ),
+
     );
   }
+
 }

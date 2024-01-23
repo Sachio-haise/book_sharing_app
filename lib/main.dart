@@ -1,5 +1,6 @@
 import 'package:book_sharing_app/pages/home.dart';
 import 'package:book_sharing_app/pages/auth.dart';
+import 'package:book_sharing_app/pages/profile.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -19,8 +20,9 @@ class MyApp extends StatelessWidget {
       defaultTransition: Transition.zoom,
       initialRoute: "/",
       getPages: [
-        GetPage(name: '/', page: () => HomePage()),
-        GetPage(name: '/auth', page: () => AuthPage()),
+        GetPage(name: '/', page: () => const HomePage()),
+        GetPage(name: '/auth', page: () => const AuthPage()),
+        GetPage(name: '/profile', page:() => const ProfilePage())
       ],
     );
   }

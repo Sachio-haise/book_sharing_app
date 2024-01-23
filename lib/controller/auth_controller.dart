@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter/foundation.dart';
 import 'package:get/get.dart';
@@ -7,7 +8,6 @@ import 'package:book_sharing_app/constants/env.dart';
 
 class AuthenticationController extends GetxController {
   final isLoading = false.obs;
-
   Map<String, dynamic> validationErrors =
       {'name': '', 'password': '', 'email': ''}.obs;
 
@@ -18,6 +18,8 @@ class AuthenticationController extends GetxController {
     required bool isSignIn,
   }) async {
     try {
+      if(isLoading.value) return;
+      debugPrint("submit");
       isLoading.value = true;
       var data = {
         'name': name,

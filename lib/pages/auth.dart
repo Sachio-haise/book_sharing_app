@@ -15,7 +15,7 @@ class _AuthPageState extends State<AuthPage> {
   final _nameController = TextEditingController();
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
-  final _authenticationController = Get.put(AuthenticationController());
+  final AuthenticationController _authenticationController = Get.put(AuthenticationController());
   bool _isSignIn = false;
 
   void toggleField() {
