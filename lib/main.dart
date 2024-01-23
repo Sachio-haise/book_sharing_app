@@ -22,7 +22,9 @@ class MyApp extends StatelessWidget {
         GetPage(name: '/', page: () => HomePage()),
         GetPage(name: '/register', page: () => RegisterPage()),
       ],
+
     );
+
   }
 }
 
