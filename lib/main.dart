@@ -19,8 +19,8 @@ class MyApp extends StatelessWidget {
       defaultTransition: Transition.zoom,
       initialRoute: "/",
       getPages: [
-        GetPage(name: '/', page: () => HomePage()),
-        GetPage(name: '/register', page: () => RegisterPage()),
+        GetPage(name: '/', page: () => const HomePage()),
+        GetPage(name: '/register', page: () => const RegisterPage()),
       ],
 
     );
