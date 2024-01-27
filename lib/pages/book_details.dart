@@ -2,9 +2,7 @@
 import 'package:flutter/material.dart';
 import 'package:readmore/readmore.dart';
 
-void main() {
-  runApp(const BookDetails());
-}
+
 
 class BookDetails extends StatefulWidget {
   const BookDetails({super.key});

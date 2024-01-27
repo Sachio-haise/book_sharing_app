@@ -1,6 +1,7 @@
 import 'package:book_sharing_app/pages/home.dart';
 import 'package:book_sharing_app/pages/auth.dart';
 import 'package:book_sharing_app/pages/profile.dart';
+import 'package:book_sharing_app/pages/book_details.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -22,7 +23,8 @@ class MyApp extends StatelessWidget {
       getPages: [
         GetPage(name: '/', page: () => const HomePage()),
         GetPage(name: '/auth', page: () => const AuthPage()),
-        GetPage(name: '/profile', page:() => const ProfilePage())
+        GetPage(name: '/profile', page:() => const ProfilePage()),
+        GetPage(name: '/book_details',page:()=>const BookDetails()),
       ],
     );
   }
