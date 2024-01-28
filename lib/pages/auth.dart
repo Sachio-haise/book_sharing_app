@@ -139,6 +139,7 @@ class _AuthPageState extends State<AuthPage> {
                         Obx(() => InputFormWidget(
                           controller: _passwordController,
                           hintText: "Password",
+                          obscureText: true,
                           validateText: _authenticationController
                               .validationErrors['password'] ??
                               '',

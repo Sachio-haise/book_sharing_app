@@ -33,6 +33,9 @@ dependencies:
   get:
   http: ^1.2.0
   shared_preferences: ^2.2.2
+  image_picker: ^1.0.7
+  hive: ^2.2.3
+  hive_flutter:
 
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
@@ -48,7 +51,8 @@ dev_dependencies:
   # package. See that file for information about deactivating specific lint
   # rules and activating additional ones.
   flutter_lints: ^2.0.0
-
+  build_runner:
+  hive_generator:
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
 
