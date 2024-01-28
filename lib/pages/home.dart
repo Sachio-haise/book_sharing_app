@@ -29,6 +29,7 @@ class _HomePageState extends State<HomePage> {
     setState(() {
       _token = token; // No need for null check here
     });
+    print("token is $token");
   }
   @override
   Widget build(BuildContext context) {
@@ -55,7 +56,7 @@ class _HomePageState extends State<HomePage> {
                 if (_token != null && _token!.isNotEmpty) {
                   Get.offAllNamed('/profile');
                 } else {
-                  Get.toNamed('/profile');
+                  Get.toNamed('/auth');
                 }
               },
               child: const CircleAvatar(

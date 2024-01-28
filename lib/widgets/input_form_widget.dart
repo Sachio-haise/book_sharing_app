@@ -5,11 +5,17 @@ class InputFormWidget extends StatefulWidget {
     super.key,
     required this.controller,
     required this.hintText,
-    required this.validateText
+    required this.validateText,
+    this.maxLines,
+    this.obscureText,
+    this.minLines
   });
 
   final String hintText;
   final String validateText;
+  final int? maxLines;
+  final int? minLines;
+  final bool? obscureText;
   final TextEditingController controller;
 
   @override
@@ -23,7 +29,10 @@ class _InputFormWidgetState extends State<InputFormWidget> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         TextFormField(
-          autofocus: true,
+          obscureText: widget.obscureText != null ? true : false,
+          autofocus: false,
+          maxLines: widget.minLines != null ? widget.maxLines ?? 6 : widget.maxLines ?? 1 ,
+          minLines: widget.minLines,
           controller: widget.controller,
           decoration:    InputDecoration(
             labelText: widget.hintText,
