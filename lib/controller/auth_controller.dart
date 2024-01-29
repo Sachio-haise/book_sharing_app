@@ -17,7 +17,7 @@ class AuthenticationController extends GetxController {
   final isLoading = false.obs;
   final isUpdating = false.obs;
   Map<String, dynamic> validationErrors =
-      {'name': '', 'password': '', 'email': '', 'old_password': ''}.obs;
+      {'name': '', 'password': '', 'email': '', 'old_password': '', 'password_confirmation': '', 'reset_code': ''}.obs;
 
   Future<User> getUser() async {
     try {
@@ -260,6 +260,141 @@ class AuthenticationController extends GetxController {
      return 500;
    }
   }
+
+  Future forgetPassword({
+    required String email,
+  }) async{
+    if (isLoading.value) return;
+    debugPrint("submit");
+    try{
+      isLoading.value = true;
+
+      var data = {
+        'email': email,
+      };
+
+      var response = await http.post(
+        Uri.parse('$baseUrl/forget-password'),
+        headers: {
+          'Accept': 'application/json',
+        },
+        body: data,
+      );
+
+      var responseBody = response.body;
+      print(responseBody);
+      validationErrors['email'] = '';
+       if (response.statusCode == 200) {
+        var decodedData = json.decode(responseBody);
+        if (decodedData.containsKey('code')) {
+          isLoading.value = false;
+          return {
+            'status': '200',
+            'code': "${decodedData['code']}"
+          };
+        }
+      } else {
+        isLoading.value = false;
+        var errorResponse = json.decode(responseBody);
+        if (errorResponse.containsKey('errors')) {
+          var errors = errorResponse['errors'];
+          // debugPrint(errors);
+          errors.forEach((field, errorMessage) {
+            validationErrors[field] = errorMessage[0];
+            debugPrint(errorMessage[0]);
+          });
+        }
+        return {
+          'status' : "${response.statusCode}",
+        };
+      }
+    }catch(e){
+      print(e);
+      isLoading.value = false;
+      return {
+        'status' : "500",
+      };
+    }
+  }
+
+  checkCode({
+     required resetCode,
+    required confirmCode,
+}) {
+    validationErrors['reset_code'] = '';
+    if(resetCode != confirmCode){
+      validationErrors['reset_code'] = 'Incorrect code';
+      return {
+        "status": "422"
+      };
+    }else {
+      return {
+        "status": "200"
+      };
+    }
+  }
+
+
+  Future resetPassword({
+    required String email,
+    required String password,
+    required String passwordConfirmation
+  }) async{
+    if (isLoading.value) return;
+    debugPrint("submit");
+    try{
+      isLoading.value = true;
+
+      print(email);
+      var data = {
+        'email': email,
+        'password': password,
+        'password_confirmation': passwordConfirmation
+      };
+
+      var response = await http.post(
+        Uri.parse('$baseUrl/reset-password'),
+        headers: {
+          'Accept': 'application/json',
+        },
+        body: data,
+      );
+
+      var responseBody = response.body;
+      validationErrors['password'] = '';
+      validationErrors['password_confirmation'] = '';
+      if (response.statusCode == 200) {
+        var decodedData = json.decode(responseBody);
+        isLoading.value = false;
+         print(decodedData);
+        return {
+          'status' : "${response.statusCode}",
+        };
+
+      } else {
+        isLoading.value = false;
+        var errorResponse = json.decode(responseBody);
+        if (errorResponse.containsKey('errors')) {
+          var errors = errorResponse['errors'];
+          // debugPrint(errors);
+          errors.forEach((field, errorMessage) {
+            validationErrors[field] = errorMessage[0];
+            debugPrint(errorMessage[0]);
+          });
+        }
+        return {
+          'status' : "${response.statusCode}",
+        };
+      }
+    }catch(e){
+      print(e);
+      isLoading.value = false;
+      return {
+        'status' : "500",
+      };
+    }
+  }
+
 
   Future uploadProfile({
     required String? id,

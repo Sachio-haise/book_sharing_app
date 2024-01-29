@@ -1,3 +1,4 @@
+import 'package:book_sharing_app/pages/forget_password.dart';
 import 'package:book_sharing_app/pages/home.dart';
 import 'package:book_sharing_app/pages/auth.dart';
 import 'package:book_sharing_app/pages/profile.dart';
@@ -30,6 +31,7 @@ class MyApp extends StatelessWidget {
         GetPage(name: '/', page: () => const HomePage()),
         GetPage(name: '/auth', page: () => const AuthPage()),
         GetPage(name: '/profile', page:() => const ProfilePage()),
+        GetPage(name: '/forget-password', page:() => const ForgetPassword()),
         GetPage(name: '/book_details',page:()=>const BookDetails()),
       ],
     );

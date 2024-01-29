@@ -36,7 +36,7 @@ dependencies:
   image_picker: ^1.0.7
   hive: ^2.2.3
   hive_flutter:
-
+  pretty_animated_buttons: ^0.0.1
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
   cupertino_icons: ^1.0.2

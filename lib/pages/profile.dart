@@ -7,6 +7,7 @@ import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:book_sharing_app/controller/auth_controller.dart';
 import 'package:flutter/foundation.dart';
+import 'package:pretty_animated_buttons/pretty_animated_buttons.dart';
 
 class ProfilePage extends StatefulWidget {
   const ProfilePage({Key? key}) : super(key: key);
@@ -342,6 +343,26 @@ class _TabSectionState extends State<TabSection> {
                                   maxLines: 3,
                                   minLines: 2,
                                   validateText: ""),
+                              PrettyShadowButton(
+                                label: "Pretty Shadow Button",
+                                onPressed: () async {
+                                  if (_formKey.currentState!.validate()) {}
+                                  final response =
+                                  await _authenticationController.updateProfile(
+                                    name: _nameController.text.trim(),
+                                    email: _emailController.text.trim(),
+                                    description: _descriptionController.text.trim(),
+                                    id: id,
+                                  );
+                                  print(response);
+                                  if (response == 200) {
+                                    _setUserInfo();
+                                    widget.setUserProfileInfo();
+                                  }
+                                },
+                                icon: Icons.arrow_forward,
+                                shadowColor: Colors.green,
+                              ),
                               ElevatedButton(
                                 onPressed: () async {
                                   if (_formKey.currentState!.validate()) {}
