@@ -2,6 +2,7 @@ import 'package:book_sharing_app/widgets/input_form_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:book_sharing_app/controller/auth_controller.dart';
+import 'package:pretty_animated_buttons/pretty_animated_buttons.dart';
 
 class AuthPage extends StatefulWidget {
   const AuthPage({super.key});
@@ -67,7 +68,8 @@ class _AuthPageState extends State<AuthPage> {
         ],
         toolbarHeight: kToolbarHeight + 20,
       ),
-      body: SingleChildScrollView(
+      body:
+      SingleChildScrollView(
         child: Padding(
           padding: const EdgeInsets.only(top:120,left: 15.0, right: 15.0),
           child: Container(
@@ -102,7 +104,7 @@ class _AuthPageState extends State<AuthPage> {
                     padding:const EdgeInsets.only(top: 10.0),
                     child: Center(
                       child: Text(
-                        _isSignIn ? "Sign IN" : "Sign Up",
+                        _isSignIn ? "Sign In" : "Sign Up",
                         style: const TextStyle(
                           fontWeight: FontWeight.bold,
                           fontSize: 25.0,
@@ -187,12 +189,17 @@ class _AuthPageState extends State<AuthPage> {
                           crossAxisAlignment: CrossAxisAlignment.center,
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            const Text("Already have an account?"),
+                            Text(
+                                _isSignIn ?
+                                "Don't have an account?" :
+                                "Already have an account?"
+                            ),
                             const SizedBox(
                               width: 10.0,
                             ),
                             InkWell(
                               onTap: () {
+                                if(_authenticationController.isLoading.value) return;
                                 toggleField();
                               },
                               child: Text(
@@ -208,13 +215,31 @@ class _AuthPageState extends State<AuthPage> {
                             ),
                           ],
                         ),
+                        if (_isSignIn) const Divider(
+                          height: 30,
+                          thickness: 1,
+                          color: Colors.green,
+                        ),
+                        if (_isSignIn) InkWell(
+                          onTap: (){
+                            Get.toNamed("/forget-password");
+                          },
+                          child: const Text(
+                            "Forget Password",
+                            style: TextStyle(
+                              color: Colors.green,
+                              fontWeight: FontWeight.bold,
+                              decoration: TextDecoration.underline,
+                              decorationColor: Colors.green
+                            ),
+                          ),
+                        ),
                         const SizedBox(
                           height: 20,
                         ),
                       ],
                     ),
                   )
-        
                 ],
               ),
             ),
