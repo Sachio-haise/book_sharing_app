@@ -4,8 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:readmore/readmore.dart';
 
-
-
 class BookDetails extends StatefulWidget {
   const BookDetails({super.key});
 
@@ -14,12 +12,10 @@ class BookDetails extends StatefulWidget {
 }
 
 class _BookDetailsState extends State<BookDetails> {
-  String authorName="C.S.Luwis";
-  String ratting='4.9/5';
   String fileUrl = "https://fluttercampus.com/sample.pdf";
 
-  String content = "byJoe NelsonMonday 22   away tobefore hosting away to Manchester City in the Continental League Cup on Wednesday before hosting Aston Villa in the WSL on Sunday.";
-  String networkImg="https://picsum.photos/250?image=9";
+  String content =
+      "byJoe NelsonMonday 22   away tobefore hosting away to Manchester City in rdfghjmkhgfdsadgtfhujhgfdsadrgthuioygtedsadgtyujhyhjgfdsadfgthyujgftdsadgtythe Continental League Cup on Wednesday before hosting Aston Villa in the WSL on Sunday.";
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -39,19 +35,21 @@ class _BookDetailsState extends State<BookDetails> {
         ),
         body: Column(
           children: [
+            //for book profile picture
             Center(
                 child: Padding(
-                  padding: const EdgeInsets.all(5),
-                  child: Image.network(
-                    networkImg,
-                    width: 100,
-                    height: 150,
-                  ),
-                )),
+              padding: const EdgeInsets.all(5),
+              child: Image.network(
+                "https://picsum.photos/250?image=9",
+                width: 100,
+                height: 150,
+              ),
+            )),
             const SizedBox(
               height: 2,
             ),
             const Padding(padding: EdgeInsets.only(left: 20)),
+            //for Book title document
             const Center(
               child: Expanded(
                 child: Text(
@@ -63,6 +61,8 @@ class _BookDetailsState extends State<BookDetails> {
                 ),
               ),
             ),
+
+            //book details ratting,author,discription
             Center(
               child: Container(
                 width: 350,
@@ -82,7 +82,7 @@ class _BookDetailsState extends State<BookDetails> {
                             style: TextStyle(fontWeight: FontWeight.bold),
                           ),
                           Text(
-                            'authorName',
+                            "C.S.Luwis",
                             style: TextStyle(fontWeight: FontWeight.bold),
                           )
                         ],
@@ -94,7 +94,7 @@ class _BookDetailsState extends State<BookDetails> {
                             style: TextStyle(fontWeight: FontWeight.bold),
                           ),
                           Text(
-                            'ratting',
+                            "4.9/5",
                             style: TextStyle(fontWeight: FontWeight.bold),
                           )
                         ],
@@ -133,6 +133,8 @@ class _BookDetailsState extends State<BookDetails> {
             const SizedBox(
               height: 8,
             ),
+
+            //button three in a row
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
@@ -140,11 +142,11 @@ class _BookDetailsState extends State<BookDetails> {
                   child: FilledButton(
                     style: ButtonStyle(
                         backgroundColor:
-                        MaterialStateProperty.all(const Color(0xFF2EC05E)),
+                            MaterialStateProperty.all(const Color(0xFF2EC05E)),
                         shape:
-                        MaterialStateProperty.all<RoundedRectangleBorder>(
-                            RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(2)))),
+                            MaterialStateProperty.all<RoundedRectangleBorder>(
+                                RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(2)))),
                     onPressed: () {},
                     child: const Text("Description"),
                   ),
@@ -156,9 +158,9 @@ class _BookDetailsState extends State<BookDetails> {
                   child: OutlinedButton(
                       style: ButtonStyle(
                           shape:
-                          MaterialStateProperty.all<RoundedRectangleBorder>(
-                              RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(2)))),
+                              MaterialStateProperty.all<RoundedRectangleBorder>(
+                                  RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(2)))),
                       onPressed: () {},
                       child: const Text("Reviews")),
                 ),
@@ -169,19 +171,21 @@ class _BookDetailsState extends State<BookDetails> {
                   child: OutlinedButton(
                       style: ButtonStyle(
                           shape:
-                          MaterialStateProperty.all<RoundedRectangleBorder>(
-                              RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(2)))),
+                              MaterialStateProperty.all<RoundedRectangleBorder>(
+                                  RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(2)))),
                       onPressed: () {},
                       child: const Text("Instruction")),
                 )
               ],
             ),
             const SizedBox(
-              height: 15,
+              height: 10,
             ),
+            //Text body book
             Center(
               child: SingleChildScrollView(
+                scrollDirection: Axis.vertical,
                 child: SizedBox(
                   width: 350,
                   child: Expanded(
@@ -205,92 +209,67 @@ class _BookDetailsState extends State<BookDetails> {
               ),
             ),
             const SizedBox(
-              height: 400,
+              height: 315,
             ),
+            //download book
             Column(
-              crossAxisAlignment: CrossAxisAlignment.center,
+              mainAxisAlignment: MainAxisAlignment.end,
               children: [
                 const Divider(),
-                Center(
-                  child: FilledButton(
-                    style: ButtonStyle(
-                        shape:
-                        MaterialStateProperty.all<RoundedRectangleBorder>(
-                            RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(2)))),
-                    onPressed: () async {
-                      Map<Permission, PermissionStatus> statuses =
-                      await [Permission.storage].request();
-                      if (statuses[Permission.storage]!.isGranted) {
-                        var dir =
-                        await DownloadsPathProvider.downloadsDirectory;
-                        if (dir != null) {
-                          String saveName = "file.pdf";
-                          String savePath = dir.path + "/$saveName";
-                          print(savePath);
-                          try {
-                            await Dio().download(fileUrl, savePath,
-                                onReceiveProgress: (received, total) {
-                                  if (total != -1) {
-                                    print((received / total * 100)
-                                        .toStringAsFixed(0) +
-                                        "%");
-                                  }
-                                });
-                            print("File is saved to download folder: ");
-                            ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(content: Text("File Downloaded")));
-                          } on DioError catch (e) {
-                            print(e.message);
+                SizedBox(
+                  width: double.infinity,
+                  height: 40,
+                  child: Container(
+                    margin: const EdgeInsets.only(bottom: 0.0),
+                    child: FilledButton(
+                      style: ButtonStyle(
+                          shape:
+                              MaterialStateProperty.all<RoundedRectangleBorder>(
+                                  RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(2)))),
+                      onPressed: () async {
+                        Map<Permission, PermissionStatus> statuses =
+                            await [Permission.storage].request();
+                        if (statuses[Permission.storage]!.isGranted) {
+                          var dir =
+                              await DownloadsPathProvider.downloadsDirectory;
+                          if (dir != null) {
+                            String saveName = "file.pdf";
+                            String savePath = dir.path + "/$saveName";
+                            print(savePath);
+                            try {
+                              await Dio().download(fileUrl, savePath,
+                                  onReceiveProgress: (received, total) {
+                                if (total != -1) {
+                                  print((received / total * 100)
+                                          .toStringAsFixed(0) +
+                                      "%");
+                                }
+                              });
+                              print("File is saved to download folder: ");
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                  const SnackBar(
+                                      content: Text("File Downloaded")));
+                            } on DioException catch (e) {
+                              print(e.message);
+                            }
                           }
+                        } else {
+                          print("No Permission to read and write");
+                          ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(
+                                  content: Text("Permission Denied")));
                         }
-                      } else {
-                        print("No Permission to read and write");
-                        ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(content: Text("Permission Denied")));
-                      }
-                    },
-                    child: const Text(
-                      "Download PDF",
-                      style: TextStyle(fontWeight: FontWeight.bold),
+                      },
+                      child: const Text(
+                        "Download PDF",
+                        style: TextStyle(fontWeight: FontWeight.bold),
+                      ),
                     ),
                   ),
                 )
               ],
             ),
-            const SizedBox(
-              height: 3,
-            ),
-            Row(
-              crossAxisAlignment: CrossAxisAlignment.end,
-              children: [
-                Expanded(
-                  child: OutlinedButton(
-                      style: ButtonStyle(
-                          shape:
-                          MaterialStateProperty.all<RoundedRectangleBorder>(
-                              RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(2)))),
-                      onPressed: () {},
-                      child: const Text("Read Sample")),
-                ),
-                const SizedBox(
-                  width: 10,
-                ),
-                Expanded(
-                  child: FilledButton(
-                      style: ButtonStyle(
-                          backgroundColor: MaterialStateProperty.all(
-                              const Color(0xFF2EC05E)),
-                          shape:
-                          MaterialStateProperty.all<RoundedRectangleBorder>(
-                              RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(2)))),
-                      onPressed: () {},
-                      child: const Text("Buy Now")),
-                )
-              ],
-            )
           ],
         ),
       ),
