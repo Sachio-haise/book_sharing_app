@@ -16,10 +16,12 @@ class BookDetails extends StatefulWidget {
 }
 
 class _BookDetailsState extends State<BookDetails> {
+  String authorName="C.S.Luwis";
+  String ratting='4.9/5';
   String fileUrl = "https://fluttercampus.com/sample.pdf";
 
-  String content =
-      "byJoe NelsonMonday 22   away tobefore hosting away to Manchester City in the Continental League Cup on Wednesday before hosting Aston Villa in the WSL on Sunday.";
+  String content = "byJoe NelsonMonday 22   away tobefore hosting away to Manchester City in the Continental League Cup on Wednesday before hosting Aston Villa in the WSL on Sunday.";
+  String networkImg="https://picsum.photos/250?image=9";
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -43,7 +45,7 @@ class _BookDetailsState extends State<BookDetails> {
                 child: Padding(
                   padding: const EdgeInsets.all(5),
                   child: Image.network(
-                    "https://picsum.photos/250?image=9",
+                    networkImg,
                     width: 100,
                     height: 150,
                   ),
@@ -82,7 +84,7 @@ class _BookDetailsState extends State<BookDetails> {
                             style: TextStyle(fontWeight: FontWeight.bold),
                           ),
                           Text(
-                            "C.S.Luwis",
+                            'authorName',
                             style: TextStyle(fontWeight: FontWeight.bold),
                           )
                         ],
@@ -94,7 +96,7 @@ class _BookDetailsState extends State<BookDetails> {
                             style: TextStyle(fontWeight: FontWeight.bold),
                           ),
                           Text(
-                            "4.9/5",
+                            'ratting',
                             style: TextStyle(fontWeight: FontWeight.bold),
                           )
                         ],
