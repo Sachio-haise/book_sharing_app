@@ -8,6 +8,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:book_sharing_app/controller/auth_controller.dart';
 import 'package:flutter/foundation.dart';
 import 'package:pretty_animated_buttons/pretty_animated_buttons.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 
 class ProfilePage extends StatefulWidget {
   const ProfilePage({Key? key}) : super(key: key);
@@ -212,7 +213,18 @@ class _ProfilePageState extends State<ProfilePage> {
         image: File(returnImage.path)
     );
     print("we got the code like $response");
-    if (response == 200) _setUserInfo();
+    if (response == 200) {
+      _setUserInfo();
+      Fluttertoast.showToast(
+          msg: "Profile Uploaded Successfully!",
+          toastLength: Toast.LENGTH_SHORT,
+          gravity: ToastGravity.CENTER,
+          timeInSecForIosWeb: 1,
+          backgroundColor: Colors.red,
+          textColor: Colors.white,
+          fontSize: 16.0
+      );
+    }
   }
 }
 
