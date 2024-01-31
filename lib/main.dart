@@ -1,3 +1,4 @@
+import 'package:book_sharing_app/pages/book_upload.dart';
 import 'package:book_sharing_app/pages/forget_password.dart';
 import 'package:book_sharing_app/pages/home.dart';
 import 'package:book_sharing_app/pages/auth.dart';
@@ -8,10 +9,10 @@ import 'package:get/get.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:book_sharing_app/model/user.dart';
 
-void main() async{
+void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Hive.initFlutter();
-  
+
   Hive.registerAdapter(UserAdapter());
   runApp(const MyApp());
 }
@@ -30,11 +31,11 @@ class MyApp extends StatelessWidget {
       getPages: [
         GetPage(name: '/', page: () => const HomePage()),
         GetPage(name: '/auth', page: () => const AuthPage()),
-        GetPage(name: '/profile', page:() => const ProfilePage()),
-        GetPage(name: '/forget-password', page:() => const ForgetPassword()),
-        GetPage(name: '/book_details',page:()=>const BookDetails()),
+        GetPage(name: '/profile', page: () => const ProfilePage()),
+        GetPage(name: '/forget-password', page: () => const ForgetPassword()),
+        GetPage(name: '/book_details', page: () => const BookDetails()),
+        GetPage(name: '/upload', page: () => const BookCreatePage())
       ],
     );
   }
 }
-

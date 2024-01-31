@@ -16,8 +16,14 @@ import 'package:book_sharing_app/constants/env.dart';
 class AuthenticationController extends GetxController {
   final isLoading = false.obs;
   final isUpdating = false.obs;
-  Map<String, dynamic> validationErrors =
-      {'name': '', 'password': '', 'email': '', 'old_password': '', 'password_confirmation': '', 'reset_code': ''}.obs;
+  Map<String, dynamic> validationErrors = {
+    'name': '',
+    'password': '',
+    'email': '',
+    'old_password': '',
+    'password_confirmation': '',
+    'reset_code': ''
+  }.obs;
 
   Future<User> getUser() async {
     try {
@@ -140,7 +146,7 @@ class AuthenticationController extends GetxController {
   }) async {
     if (isUpdating.value) return;
     debugPrint("submit");
-    try{
+    try {
       isUpdating.value = true;
 
       final SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -148,7 +154,7 @@ class AuthenticationController extends GetxController {
       debugPrint("token is $token");
 
       var data = {
-        'id': "$id" ,
+        'id': "$id",
         'old_password': oldPassword,
         'password': password
       };
@@ -189,7 +195,7 @@ class AuthenticationController extends GetxController {
         }
       }
       return response.statusCode;
-    }catch(e){
+    } catch (e) {
       print(e);
       isUpdating.value = false;
       return 500;
@@ -204,69 +210,69 @@ class AuthenticationController extends GetxController {
   }) async {
     if (isLoading.value) return;
     debugPrint("submit");
-   try{
-     isLoading.value = true;
+    try {
+      isLoading.value = true;
 
-     final SharedPreferences prefs = await SharedPreferences.getInstance();
-     final String? token = prefs.getString('token');
-     debugPrint("token is $token");
+      final SharedPreferences prefs = await SharedPreferences.getInstance();
+      final String? token = prefs.getString('token');
+      debugPrint("token is $token");
 
-     var data = {
-       'id': "$id" ,
-       'name': name,
-       'email': email,
-       'description': description,
-     };
+      var data = {
+        'id': "$id",
+        'name': name,
+        'email': email,
+        'description': description,
+      };
 
-     var response = await http.post(
-       Uri.parse('$baseUrl/update-profile'),
-       headers: {
-         'Accept': 'application/json',
-         'Authorization': "Bearer $token",
-       },
-       body: data,
-     );
+      var response = await http.post(
+        Uri.parse('$baseUrl/update-profile'),
+        headers: {
+          'Accept': 'application/json',
+          'Authorization': "Bearer $token",
+        },
+        body: data,
+      );
 
-     var responseBody = response.body;
-     validationErrors['name'] = '';
-     validationErrors['email'] = '';
-     print(response.statusCode);
-     if (response.statusCode == 200) {
-       var decodedData = json.decode(responseBody);
-       if (decodedData.containsKey('token')) {
-         debugPrint(decodedData['token']);
-         SharedPreferences.setMockInitialValues({});
-         final SharedPreferences prefs = await SharedPreferences.getInstance();
-         // Save an String value to 'action' key.
-         await prefs.setString('token', decodedData['token']);
-       }
-       isLoading.value = false;
-     } else {
-       isLoading.value = false;
-       var errorResponse = json.decode(responseBody);
-       if (errorResponse.containsKey('errors')) {
-         var errors = errorResponse['errors'];
-         // debugPrint(errors);
-         errors.forEach((field, errorMessage) {
-           validationErrors[field] = errorMessage[0];
-           debugPrint(errorMessage[0]);
-         });
-       }
-     }
-     return response.statusCode;
-   }catch(e){
-     print(e);
-     isLoading.value = false;
-     return 500;
-   }
+      var responseBody = response.body;
+      validationErrors['name'] = '';
+      validationErrors['email'] = '';
+      print(response.statusCode);
+      if (response.statusCode == 200) {
+        var decodedData = json.decode(responseBody);
+        if (decodedData.containsKey('token')) {
+          debugPrint(decodedData['token']);
+          SharedPreferences.setMockInitialValues({});
+          final SharedPreferences prefs = await SharedPreferences.getInstance();
+          // Save an String value to 'action' key.
+          await prefs.setString('token', decodedData['token']);
+        }
+        isLoading.value = false;
+      } else {
+        isLoading.value = false;
+        var errorResponse = json.decode(responseBody);
+        if (errorResponse.containsKey('errors')) {
+          var errors = errorResponse['errors'];
+          // debugPrint(errors);
+          errors.forEach((field, errorMessage) {
+            validationErrors[field] = errorMessage[0];
+            debugPrint(errorMessage[0]);
+          });
+        }
+      }
+      return response.statusCode;
+    } catch (e) {
+      print(e);
+      isLoading.value = false;
+      return 500;
+    }
   }
 
   Future forgetPassword({
     required String email,
-  }) async{
+  }) async {
     if (isLoading.value) return;
     debugPrint("submit");
-    try{
+    try {
       isLoading.value = true;
 
       var data = {
@@ -284,14 +290,11 @@ class AuthenticationController extends GetxController {
       var responseBody = response.body;
       print(responseBody);
       validationErrors['email'] = '';
-       if (response.statusCode == 200) {
+      if (response.statusCode == 200) {
         var decodedData = json.decode(responseBody);
         if (decodedData.containsKey('code')) {
           isLoading.value = false;
-          return {
-            'status': '200',
-            'code': "${decodedData['code']}"
-          };
+          return {'status': '200', 'code': "${decodedData['code']}"};
         }
       } else {
         isLoading.value = false;
@@ -305,44 +308,38 @@ class AuthenticationController extends GetxController {
           });
         }
         return {
-          'status' : "${response.statusCode}",
+          'status': "${response.statusCode}",
         };
       }
-    }catch(e){
+    } catch (e) {
       print(e);
       isLoading.value = false;
       return {
-        'status' : "500",
+        'status': "500",
       };
     }
   }
 
   checkCode({
-     required resetCode,
+    required resetCode,
     required confirmCode,
-}) {
+  }) {
     validationErrors['reset_code'] = '';
-    if(resetCode != confirmCode){
+    if (resetCode != confirmCode) {
       validationErrors['reset_code'] = 'Incorrect code';
-      return {
-        "status": "422"
-      };
-    }else {
-      return {
-        "status": "200"
-      };
+      return {"status": "422"};
+    } else {
+      return {"status": "200"};
     }
   }
 
-
-  Future resetPassword({
-    required String email,
-    required String password,
-    required String passwordConfirmation
-  }) async{
+  Future resetPassword(
+      {required String email,
+      required String password,
+      required String passwordConfirmation}) async {
     if (isLoading.value) return;
     debugPrint("submit");
-    try{
+    try {
       isLoading.value = true;
 
       print(email);
@@ -366,11 +363,10 @@ class AuthenticationController extends GetxController {
       if (response.statusCode == 200) {
         var decodedData = json.decode(responseBody);
         isLoading.value = false;
-         print(decodedData);
+        print(decodedData);
         return {
-          'status' : "${response.statusCode}",
+          'status': "${response.statusCode}",
         };
-
       } else {
         isLoading.value = false;
         var errorResponse = json.decode(responseBody);
@@ -383,23 +379,19 @@ class AuthenticationController extends GetxController {
           });
         }
         return {
-          'status' : "${response.statusCode}",
+          'status': "${response.statusCode}",
         };
       }
-    }catch(e){
+    } catch (e) {
       print(e);
       isLoading.value = false;
       return {
-        'status' : "500",
+        'status': "500",
       };
     }
   }
 
-
-  Future uploadProfile({
-    required String? id,
-    required File image
-  }) async {
+  Future uploadProfile({required String? id, required File image}) async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
     final String? token = prefs.getString('token');
     debugPrint("token is $token");
