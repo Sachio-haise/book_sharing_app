@@ -2,6 +2,7 @@ import 'dart:io';
 import 'package:book_sharing_app/model/book.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
 
 class BookCreatePage extends StatefulWidget {
@@ -12,24 +13,44 @@ class BookCreatePage extends StatefulWidget {
 }
 
 class _BookCreatePageState extends State<BookCreatePage> {
-  // User user = Get.find<AuthenticationController>().getUser() as User;
   TextEditingController nameController = TextEditingController();
   TextEditingController descriptionController = TextEditingController();
   TextEditingController reviewController = TextEditingController();
-  File? photo;
-  File? book;
-  int status = 0; // 0 for private, 1 for public
-  String userName = 'Myo Min Ko';
+  File? _photo;
+  File? _book;
+  int? status = 0; // 0 for private, 1 for public
+  User? user;
+  var token;
+
+  @override
+  void initState() {
+    super.initState();
+    _getTokenFromRoute();
+    _setUserInfo();
+  }
+
+  void _getTokenFromRoute() {
+    token = Get.arguments;
+  }
 
   Future<void> _uploadPhoto() async {
     final picker = ImagePicker();
     final pickedFile = await picker.pickImage(source: ImageSource.gallery);
     if (pickedFile != null) {
       setState(() {
-        photo = File(pickedFile.path);
-        print(photo);
+        _photo = File(pickedFile.path);
+        print(_photo);
       });
     }
+  }
+
+  _setUserInfo() async {
+    final userData = await User.getUser(token: token!);
+
+    setState(() {
+      user = userData;
+      print(user);
+    });
   }
 
   Future<void> _uploadBook() async {
@@ -38,8 +59,8 @@ class _BookCreatePageState extends State<BookCreatePage> {
         .pickFiles(type: FileType.custom, allowedExtensions: ['pdf']);
     if (pickedFile != null) {
       setState(() {
-        book = File(pickedFile.files.single.path!);
-        print(book);
+        _book = File(pickedFile.files.single.path!);
+        print(_book);
       });
     }
   }
@@ -48,12 +69,12 @@ class _BookCreatePageState extends State<BookCreatePage> {
     //apicall
     try {
       Book.createBook(
-          userId: '5',
+          userId: user!.id.toString(),
           name: nameController.text,
           description: descriptionController.text,
           review: reviewController.text,
-          photo: photo!,
-          book: book!,
+          photo: _photo!,
+          book: _book!,
           status: status.toString());
       Navigator.pushReplacementNamed(context, '/');
     } catch (e) {
@@ -73,9 +94,13 @@ class _BookCreatePageState extends State<BookCreatePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        centerTitle: true,
-        title: const Text('Book Upload'),
-      ),
+          centerTitle: true,
+          title: const Text('Book Upload'),
+          leading: IconButton(
+              icon: const Icon(Icons.arrow_back),
+              onPressed: () {
+                Get.offAllNamed('/');
+              })),
       body: SingleChildScrollView(
         scrollDirection: Axis.vertical,
         child: Padding(
@@ -84,7 +109,7 @@ class _BookCreatePageState extends State<BookCreatePage> {
             children: [
               Container(
                 alignment: Alignment.topRight,
-                child: Text(userName,
+                child: Text(user != null ? user!.name : 'User',
                     style: const TextStyle(
                       color: Colors.black,
                       fontSize: 12,
@@ -123,9 +148,9 @@ class _BookCreatePageState extends State<BookCreatePage> {
                         style: BorderStyle.solid, // Set border style to dashed
                       ),
                     ),
-                    child: photo != null
+                    child: _photo != null
                         ? Image.file(
-                            photo!,
+                            _photo!,
                             height: 200,
                           )
                         : Row(
@@ -141,13 +166,13 @@ class _BookCreatePageState extends State<BookCreatePage> {
               GestureDetector(
                 onTap: () {
                   // TODO: Implement showing the selected book file
-                  if (book != null) {
+                  if (_book != null) {
                     showDialog(
                       context: context,
                       builder: (BuildContext context) {
                         return AlertDialog(
                           title: const Text('Selected Book'),
-                          content: Image.file(book!),
+                          content: Image.file(_book!),
                           actions: [
                             TextButton(
                               onPressed: () {
@@ -172,13 +197,13 @@ class _BookCreatePageState extends State<BookCreatePage> {
                       style: BorderStyle.solid, // Set border style to dashed
                     ),
                   ),
-                  child: book != null
+                  child: _book != null
                       ? Center(
                           child: Column(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
                             const Icon(Icons.menu_book_outlined),
-                            Text(book!.path.split('/').last),
+                            Text(_book!.path.split('/').last),
                           ],
                         ))
                       : Column(
@@ -197,7 +222,7 @@ class _BookCreatePageState extends State<BookCreatePage> {
                   children: [
                     Radio<int>(
                       value: 0,
-                      groupValue: status,
+                      groupValue: int.parse(status.toString()),
                       onChanged: (value) {
                         setState(() {
                           status = value!;
@@ -207,7 +232,7 @@ class _BookCreatePageState extends State<BookCreatePage> {
                     const Text('Private'),
                     Radio<int>(
                       value: 1,
-                      groupValue: status,
+                      groupValue: int.parse(status.toString()),
                       onChanged: (value) {
                         setState(() {
                           status = value!;

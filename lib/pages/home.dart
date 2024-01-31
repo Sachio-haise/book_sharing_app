@@ -1,8 +1,4 @@
 import 'dart:async';
-
-import 'package:book_sharing_app/controller/auth_controller.dart';
-import 'package:book_sharing_app/model/book.dart';
-import 'package:book_sharing_app/pages/auth.dart';
 import 'package:book_sharing_app/widgets/books_list.dart';
 import 'package:book_sharing_app/widgets/card_scroll.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -58,7 +54,7 @@ class _HomePageState extends State<HomePage> {
                 if (_token != null && _token!.isNotEmpty) {
                   Get.offAllNamed('/profile');
                 } else {
-                  Get.toNamed('/profile');
+                  Get.toNamed('/auth');
                 }
               },
               child: const CircleAvatar(
@@ -99,7 +95,7 @@ class _HomePageState extends State<HomePage> {
                       if (_token != null && _token!.isNotEmpty) {
                         Get.offAllNamed('/book_lists');
                       } else {
-                        Get.toNamed('/book_lists');
+                        Get.toNamed('/auth');
                       }
                     },
                     child: const Text(
@@ -145,7 +141,7 @@ class _HomePageState extends State<HomePage> {
                       if (_token != null && _token!.isNotEmpty) {
                         Get.offAllNamed('/book_lists');
                       } else {
-                        Get.toNamed('/book_lists');
+                        Get.toNamed('/auth');
                       }
                     },
                     child: const Text(
@@ -171,9 +167,9 @@ class _HomePageState extends State<HomePage> {
         backgroundColor: Colors.green,
         onPressed: () {
           if (_token != null && _token!.isNotEmpty) {
-            Get.offAllNamed('/upload');
+            Get.offAllNamed('/upload', arguments: _token);
           } else {
-            Get.toNamed('/upload');
+            Get.toNamed('/auth');
           }
         },
         child: const Icon(

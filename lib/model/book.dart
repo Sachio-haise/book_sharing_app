@@ -1,67 +1,10 @@
 import 'dart:io';
+import 'dart:async';
 
 import 'package:book_sharing_app/constants/env.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
-
-// api data
-//  "data": [
-//         {
-//             "id": 8,
-//             "name": "Java",
-//             "description": "This is Java Book Description",
-//             "review": "This is Java Book One Review This is Book One Review This is Book One Review",
-//             "status": "0",
-//             "photo": {
-//                 "id": 17,
-//                 "public_path": "https://book-sharing-app-api.onrender.com/storage/media/book/book_java_281027/book-1706604704_609c593b.png"
-//             },
-//             "book": {
-//                 "id": 18,
-//                 "public_path": "https://book-sharing-app-api.onrender.com/storage/media/book/book_java_281027/book-1706604704_b7259bab.pdf"
-//             },
-//             "user": {
-//                 "id": 5,
-//                 "name": "Myo Min Ko",
-//                 "email": "adminmk@gmail.com",
-//                 "profile": {
-//                     "id": 19,
-//                     "public_path": "https://book-sharing-app-api.onrender.com/storage/media/user/tmpphpnpadno/user-1706605242_a91ba615.jpg"
-//                 },
-//                 "description": null,
-//                 "created_at": "15 hours ago"
-//             },
-//             "reactions": 0
-//         },
-//         {
-//             "id": 7,
-//             "name": "Java",
-//             "description": "This is Java Book Description",
-//             "review": "This is Java Book One Review This is Book One Review This is Book One Review",
-//             "status": "0",
-//             "photo": {
-//                 "id": 15,
-//                 "public_path": "https://book-sharing-app-api.onrender.com/storage/media/book/book_java_447769/book-1706603887_eedac4c1.png"
-//             },
-//             "book": {
-//                 "id": 16,
-//                 "public_path": "https://book-sharing-app-api.onrender.com/storage/media/book/book_java_447769/book-1706603888_5088849b.pdf"
-//             },
-//             "user": {
-//                 "id": 5,
-//                 "name": "Myo Min Ko",
-//                 "email": "adminmk@gmail.com",
-//                 "profile": {
-//                     "id": 19,
-//                     "public_path": "https://book-sharing-app-api.onrender.com/storage/media/user/tmpphpnpadno/user-1706605242_a91ba615.jpg"
-//                 },
-//                 "description": null,
-//                 "created_at": "15 hours ago"
-//             },
-//             "reactions": 0
-//         }
-//     ]
-// }
+import 'package:path/path.dart';
 
 class Book {
   String id;
@@ -127,6 +70,14 @@ class Book {
       required File book,
       required String status}) async {
     var request = http.MultipartRequest('POST', Uri.parse('$baseUrl/add-book'));
+    var stream = http.ByteStream(Stream.castFrom(photo.openRead()));
+    var length = await photo.length();
+    var multipartFile = http.MultipartFile('photo', stream, length,
+        filename: basename(photo.path));
+    var stream2 = http.ByteStream(Stream.castFrom(book.openRead()));
+    var length2 = await book.length();
+    var multipartFile2 = http.MultipartFile('book', stream2, length2,
+        filename: basename(book.path));
     request.fields.addAll({
       'user': userId,
       'name': name,
@@ -134,8 +85,8 @@ class Book {
       'review': review,
       'status': status
     });
-    request.files.add(await http.MultipartFile.fromPath('photo', photo.path));
-    request.files.add(await http.MultipartFile.fromPath('book', book.path));
+    request.files.add(multipartFile);
+    request.files.add(multipartFile2);
     var response = await request.send();
     var responseData = await http.Response.fromStream(response);
     if (response.statusCode == 200) {
@@ -229,6 +180,22 @@ class User {
       description: json['description'],
       createdAt: json['created_at'],
     );
+  }
+  static Future<User> getUser({required dynamic token}) async {
+    final response = await http.get(
+      Uri.parse('$baseUrl/user'),
+      headers: {
+        'Accept': 'application/json',
+        'Authorization': 'Bearer $token',
+      },
+    );
+    if (response.statusCode == 200) {
+      var data = json.decode(response.body);
+      User user = User.fromJson(data['data']);
+      return user;
+    } else {
+      throw Exception('Failed to load user');
+    }
   }
 }
 
