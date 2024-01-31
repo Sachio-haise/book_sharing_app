@@ -47,6 +47,12 @@ class _ProfilePageState extends State<ProfilePage> {
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.grey[200],
+        leading:   InkWell(
+            onTap: (){
+              Get.toNamed('/');
+            },
+            child:  const Icon(Icons.arrow_back)
+        ),
         title: const Center(
           child: Row(
             mainAxisAlignment: MainAxisAlignment.center,
@@ -70,7 +76,7 @@ class _ProfilePageState extends State<ProfilePage> {
             padding: const EdgeInsets.only(right: 16.0, top: 8.0),
             child: InkWell(
               onTap: () {
-                Get.toNamed('/');
+                Get.toNamed('/profile');
               },
               child: CircleAvatar(
                 radius: 20,
@@ -175,7 +181,8 @@ class _ProfilePageState extends State<ProfilePage> {
                 style: TextStyle(
                     fontSize: 16,
                     color: Colors.green,
-                    fontWeight: FontWeight.bold),
+                    fontWeight: FontWeight.bold
+                ),
               ),
             ),
             Padding(

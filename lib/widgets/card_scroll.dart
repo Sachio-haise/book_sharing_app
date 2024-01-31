@@ -1,6 +1,8 @@
 import 'package:book_sharing_app/model/book.dart';
+import 'package:book_sharing_app/pages/book_details.dart';
 import 'package:book_sharing_app/widgets/reading_card_list.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 
 class CardRow extends StatefulWidget {
   const CardRow({Key? key}) : super(key: key);
@@ -38,6 +40,7 @@ class _CardRowState extends State<CardRow> {
                   //go to book details page
                   Navigator.pushNamed(context, '/book_details',
                       arguments: book);
+                  Get.to(BookDetails(image: book.photo, title: book.name, description: book.description, author: book.user.name , pdf: book.book,));
                 },
                 pressRead: () {
                   // Handle press read

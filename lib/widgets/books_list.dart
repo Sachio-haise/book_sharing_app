@@ -2,7 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:book_sharing_app/model/book.dart';
 
 class Books extends StatefulWidget {
-  Books({Key? key}) : super(key: key);
+  const Books({
+    Key? key
+  }) : super(key: key);
 
   @override
   State<Books> createState() => _BooksState();

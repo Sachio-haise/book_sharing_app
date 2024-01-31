@@ -58,7 +58,7 @@ class _HomePageState extends State<HomePage> {
                 if (_token != null && _token!.isNotEmpty) {
                   Get.offAllNamed('/profile');
                 } else {
-                  Get.toNamed('/profile');
+                  Get.toNamed('/auth');
                 }
               },
               child: const CircleAvatar(
@@ -158,8 +158,6 @@ class _HomePageState extends State<HomePage> {
                   ),
                 ],
               )),
-
-          //All Books images and name
           Books()
         ],
       ),
