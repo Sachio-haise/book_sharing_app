@@ -33,7 +33,6 @@ class MyApp extends StatelessWidget {
         GetPage(name: '/auth', page: () => const AuthPage()),
         GetPage(name: '/profile', page: () => const ProfilePage()),
         GetPage(name: '/forget-password', page: () => const ForgetPassword()),
-        GetPage(name: '/book_details', page: () => const BookDetails()),
         GetPage(name: '/upload', page: () => const BookCreatePage())
       ],
     );

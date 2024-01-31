@@ -154,8 +154,6 @@ class _HomePageState extends State<HomePage> {
                   ),
                 ],
               )),
-
-          //All Books images and name
           Books()
         ],
       ),

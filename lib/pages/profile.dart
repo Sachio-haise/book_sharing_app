@@ -8,6 +8,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:book_sharing_app/controller/auth_controller.dart';
 import 'package:flutter/foundation.dart';
 import 'package:pretty_animated_buttons/pretty_animated_buttons.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 
 class ProfilePage extends StatefulWidget {
   const ProfilePage({Key? key}) : super(key: key);
@@ -46,6 +47,12 @@ class _ProfilePageState extends State<ProfilePage> {
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.grey[200],
+        leading:   InkWell(
+            onTap: (){
+              Get.toNamed('/');
+            },
+            child:  const Icon(Icons.arrow_back)
+        ),
         title: const Center(
           child: Row(
             mainAxisAlignment: MainAxisAlignment.center,
@@ -69,7 +76,7 @@ class _ProfilePageState extends State<ProfilePage> {
             padding: const EdgeInsets.only(right: 16.0, top: 8.0),
             child: InkWell(
               onTap: () {
-                Get.toNamed('/');
+                Get.toNamed('/profile');
               },
               child: CircleAvatar(
                 radius: 20,
@@ -174,7 +181,8 @@ class _ProfilePageState extends State<ProfilePage> {
                 style: TextStyle(
                     fontSize: 16,
                     color: Colors.green,
-                    fontWeight: FontWeight.bold),
+                    fontWeight: FontWeight.bold
+                ),
               ),
             ),
             Padding(
@@ -212,7 +220,18 @@ class _ProfilePageState extends State<ProfilePage> {
         image: File(returnImage.path)
     );
     print("we got the code like $response");
-    if (response == 200) _setUserInfo();
+    if (response == 200) {
+      _setUserInfo();
+      Fluttertoast.showToast(
+          msg: "Profile Uploaded Successfully!",
+          toastLength: Toast.LENGTH_SHORT,
+          gravity: ToastGravity.CENTER,
+          timeInSecForIosWeb: 1,
+          backgroundColor: Colors.red,
+          textColor: Colors.white,
+          fontSize: 16.0
+      );
+    }
   }
 }
 
