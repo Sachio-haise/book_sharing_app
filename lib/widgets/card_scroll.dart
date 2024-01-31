@@ -35,7 +35,9 @@ class _CardRowState extends State<CardRow> {
                 auth: book.user.name,
                 rating: book.reactions,
                 pressDetails: () {
-                  // Handle press details
+                  //go to book details page
+                  Navigator.pushNamed(context, '/book_details',
+                      arguments: book);
                 },
                 pressRead: () {
                   // Handle press read
