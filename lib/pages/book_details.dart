@@ -204,22 +204,20 @@ class _BookDetailsState extends State<BookDetails> {
               child: Padding(
                 padding: const EdgeInsets.only(left:24.0,right: 24.0),
                 child: SizedBox(
-                  child: Expanded(
-                    child: ReadMoreText(
-                      "${widget.description} .'This is a msg from AKM.Try To Download this pdf to save in the user phoen'. ${widget.pdf.publicPath}" ,
-                      trimLines: 5,
-                      textAlign: TextAlign.justify,
-                      trimMode: TrimMode.Line,
-                      trimCollapsedText: "Read More",
-                      trimExpandedText: "Show Less",
-                      lessStyle: TextStyle(
-                          fontWeight: FontWeight.bold, color: Colors.grey[700]),
-                      moreStyle: const TextStyle(
-                        fontWeight: FontWeight.bold,
-                        color: Color(0xFF252435),
-                      ),
-                      style: const TextStyle(fontSize: 16),
+                  child: ReadMoreText(
+                    "${widget.description} .'This is a msg from AKM.Try To Download this pdf to save in the user phoen'. ${widget.pdf.publicPath}" ,
+                    trimLines: 5,
+                    textAlign: TextAlign.justify,
+                    trimMode: TrimMode.Line,
+                    trimCollapsedText: "Read More",
+                    trimExpandedText: "Show Less",
+                    lessStyle: TextStyle(
+                        fontWeight: FontWeight.bold, color: Colors.grey[700]),
+                    moreStyle: const TextStyle(
+                      fontWeight: FontWeight.bold,
+                      color: Color(0xFF252435),
                     ),
+                    style: const TextStyle(fontSize: 16),
                   ),
                 ),
               ),

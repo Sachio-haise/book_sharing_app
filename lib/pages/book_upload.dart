@@ -7,7 +7,6 @@ import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:book_sharing_app/controller/auth_controller.dart';
 
-
 class BookCreatePage extends StatefulWidget {
   const BookCreatePage({Key? key}) : super(key: key);
 
@@ -19,7 +18,8 @@ class _BookCreatePageState extends State<BookCreatePage> {
   TextEditingController nameController = TextEditingController();
   TextEditingController descriptionController = TextEditingController();
   TextEditingController reviewController = TextEditingController();
-  final AuthenticationController _authenticationController = Get.find();
+  final AuthenticationController _authenticationController =
+      Get.put(AuthenticationController());
   String? profileImage;
   File? _photo;
   File? _book;
@@ -70,7 +70,31 @@ class _BookCreatePageState extends State<BookCreatePage> {
     }
   }
 
-  Future<void> _uploadBookFile() async {
+  _showSuccessSnackBar(BuildContext context) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: const Text(
+          'Book uploaded successfully!',
+          style: TextStyle(color: Colors.green),
+        ),
+        backgroundColor: Colors.green.shade100,
+      ),
+    );
+  }
+
+  _showErrorSnackBar(BuildContext context) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: const Text(
+          'Error occurred!',
+          style: TextStyle(color: Colors.red),
+        ),
+        backgroundColor: Colors.red.shade100,
+      ),
+    );
+  }
+
+  Future<void> _uploadBookFile(BuildContext context) async {
     //apicall
     try {
       final res = await Book.createBook(
@@ -81,8 +105,13 @@ class _BookCreatePageState extends State<BookCreatePage> {
           photo: _photo!,
           book: _book!,
           status: status.toString());
+      if (res != null) {
+        Get.back();
+        _showSuccessSnackBar(context);
+      }
       print("we got the result ${res}");
     } catch (e) {
+      _showErrorSnackBar(context);
       print(e);
     }
   }
@@ -250,7 +279,7 @@ class _BookCreatePageState extends State<BookCreatePage> {
               ),
               ElevatedButton(
                 onPressed: () async {
-                  await _uploadBookFile();
+                  await _uploadBookFile(context);
                 },
                 child: const Text('Upload Book',
                     style: TextStyle(fontSize: 20, color: Colors.green)),
