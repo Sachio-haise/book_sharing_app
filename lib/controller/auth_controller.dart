@@ -30,8 +30,7 @@ class AuthenticationController extends GetxController {
 
   Future<void> fetchUserData() async {
     final userData = await getUser();
-    user = userData;
-    profileImage = user?.profile?.public_path;
+
     update();
   }
 
@@ -58,8 +57,11 @@ class AuthenticationController extends GetxController {
         final dynamic userData = data['data'];
         print("getUser - User Data: $userData");
 
-        final User user = User.fromJson(userData);
-        return user;
+        final User userModel = User.fromJson(userData);
+        user = userModel;
+        profileImage = userModel.profile?.public_path ?? '';
+        update();
+        return userModel;
         // You can now handle the user data as needed
         // For example, storing it in a Hive box
         // final userBox = await Hive.openBox('user');
@@ -124,12 +126,11 @@ class AuthenticationController extends GetxController {
         var decodedData = json.decode(responseBody);
         if (decodedData.containsKey('token')) {
           debugPrint(decodedData['token']);
-          SharedPreferences.setMockInitialValues({});
           final SharedPreferences prefs = await SharedPreferences.getInstance();
 
           // Save an String value to 'action' key.
           await prefs.setString('token', decodedData['token']);
-          Get.toNamed('/');
+          Get.offAllNamed('/');
         }
         isLoading.value = false;
       } else {

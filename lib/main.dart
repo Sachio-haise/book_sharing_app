@@ -50,9 +50,9 @@ void configLoading() {
     ..indicatorSize = 45.0
     ..radius = 10.0
     ..progressColor = Colors.yellow
-    ..backgroundColor = Colors.green
-    ..indicatorColor = Colors.white
-    ..textColor = Colors.white
+    ..backgroundColor = Colors.white
+    ..indicatorColor = Colors.green
+    ..textColor = Colors.green
     ..maskColor = Colors.blue.withOpacity(0.5)
     ..userInteractions = false
     ..dismissOnTap = false;

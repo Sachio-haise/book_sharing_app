@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'dart:typed_data';
+import 'package:book_sharing_app/controller/book_controller.dart';
 import 'package:book_sharing_app/model/user.dart';
 import 'package:book_sharing_app/widgets/input_form_widget.dart';
 import 'package:flutter/material.dart';
@@ -9,6 +10,8 @@ import 'package:book_sharing_app/controller/auth_controller.dart';
 import 'package:flutter/foundation.dart';
 import 'package:pretty_animated_buttons/pretty_animated_buttons.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+
+import '../model/book.dart';
 
 class ProfilePage extends StatefulWidget {
   const ProfilePage({Key? key}) : super(key: key);
@@ -34,11 +37,12 @@ class _ProfilePageState extends State<ProfilePage> {
 
   _setUserInfo() async {
     await _authenticationController.fetchUserData();
+    print("authentication ${_authenticationController.user?.name}");
   }
 
   @override
   Widget build(BuildContext context) {
-    return GetBuilder<AuthenticationController>(builder: (_) {
+    return GetBuilder<AuthenticationController>(builder: (context) {
       return SingleChildScrollView(
         child: Column(
           mainAxisSize: MainAxisSize.min,
@@ -98,7 +102,7 @@ class _ProfilePageState extends State<ProfilePage> {
                       style: const TextStyle(
                         color: Colors.green,
                         fontWeight: FontWeight.bold,
-                        fontSize: 20.0,
+                        fontSize: 22.0,
                       ),
                     ),
                     const Padding(
@@ -146,8 +150,12 @@ class _ProfilePageState extends State<ProfilePage> {
             const SizedBox(
               height: 15.0,
             ),
-            TabSection(
-              setUserProfileInfo: _setUserInfo,
+            Flexible(
+              child: SizedBox(
+                child: TabSection(
+                  setUserProfileInfo: _setUserInfo,
+                ),
+              ),
             )
           ],
         ),
@@ -273,7 +281,7 @@ class _TabSectionState extends State<TabSection> {
               //Add this to give height
               height: MediaQuery.of(context).size.height,
               child: TabBarView(children: [
-                Text("Articles Body"),
+                ManageBooks(),
                 Column(
                   children: [
                     const SizedBox(
@@ -368,7 +376,8 @@ class _TabSectionState extends State<TabSection> {
                                               SizedBox(
                                                 width: 15.0,
                                                 height: 15.0,
-                                                child: CircularProgressIndicator(
+                                                child:
+                                                    CircularProgressIndicator(
                                                   color: Colors.green,
                                                   strokeWidth: 3.0,
                                                 ),
@@ -377,7 +386,8 @@ class _TabSectionState extends State<TabSection> {
                                           )
                                         : const Text(
                                             "Update",
-                                            style: TextStyle(color: Colors.green),
+                                            style:
+                                                TextStyle(color: Colors.green),
                                           );
                                   }),
                                 ),
@@ -452,7 +462,8 @@ class _TabSectionState extends State<TabSection> {
                                               SizedBox(
                                                 width: 15.0,
                                                 height: 15.0,
-                                                child: CircularProgressIndicator(
+                                                child:
+                                                    CircularProgressIndicator(
                                                   color: Colors.green,
                                                   strokeWidth: 3.0,
                                                 ),
@@ -461,7 +472,8 @@ class _TabSectionState extends State<TabSection> {
                                           )
                                         : const Text(
                                             "Confirm",
-                                            style: TextStyle(color: Colors.green),
+                                            style:
+                                                TextStyle(color: Colors.green),
                                           );
                                   }),
                                 ),
@@ -479,8 +491,8 @@ class _TabSectionState extends State<TabSection> {
                           _authenticationController.logout();
                         },
                         style: ElevatedButton.styleFrom(
-                            primary: Colors.red[600],
-                            ),
+                          primary: Colors.red[600],
+                        ),
                         child: const SizedBox(
                           width: double.infinity,
                           child: Center(
@@ -493,12 +505,92 @@ class _TabSectionState extends State<TabSection> {
                           ),
                         ))
                   ],
-                )
+                ),
               ]),
             ),
           ],
         ),
       ),
     );
+  }
+}
+
+class ManageBooks extends StatefulWidget {
+  ManageBooks({
+    super.key,
+  });
+
+  @override
+  State<ManageBooks> createState() => _ManageBooksState();
+}
+
+class _ManageBooksState extends State<ManageBooks> {
+  final _authController = Get.find<AuthenticationController>();
+
+  final _bookController = Get.find<BookController>();
+
+  @override
+  void initState() {
+    super.initState();
+    findBooksByAuthor();
+  }
+
+  findBooksByAuthor() {
+    _bookController.findBooksByAuthor(_authController.user?.name ?? '');
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Obx(() {
+      return GridView.builder(
+        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+          crossAxisCount: 2,
+          childAspectRatio: 1.3,
+        ),
+        physics: const NeverScrollableScrollPhysics(),
+        shrinkWrap: true,
+        itemCount: _bookController.bookByAuthor.length,
+        itemBuilder: (context, index) {
+          final book = _bookController.bookByAuthor[index];
+          return Container(
+            margin: const EdgeInsets.all(4.0),
+            padding: const EdgeInsets.all(8.0),
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(12),
+              color: Colors.green.shade50,
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                Text(
+                  book.name,
+                  style: const TextStyle(fontWeight: FontWeight.w700),
+                  maxLines: 6,
+                ),
+                Text(
+                  book.description,
+                  maxLines: 3,
+                  overflow: TextOverflow.ellipsis,
+                ),
+                Align(
+                  alignment: Alignment.bottomRight,
+                  child: InkWell(
+                    onTap: () {
+                      _bookController.deleteBook(
+                          book.id, _authController.user?.name ?? '', context);
+                    },
+                    child: const Icon(
+                      Icons.delete,
+                      color: Colors.red,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          );
+        },
+      );
+    });
   }
 }

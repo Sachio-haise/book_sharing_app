@@ -1,6 +1,8 @@
 import 'dart:convert';
 
 import 'package:book_sharing_app/constants/env.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
@@ -10,9 +12,18 @@ import '../model/book.dart';
 class BookController extends GetxController {
   final isInProcess = false.obs;
   RxList<Book> books = <Book>[].obs;
+  RxList<Book> bookByAuthor = <Book>[].obs;
   Future<void> loadBooks() async {
     List<Book> fetchedBooks = await Book.getAllBooks();
     books.value = fetchedBooks;
+  }
+
+  void findBooksByAuthor(String author) {
+    bookByAuthor.value = books
+        .where((b) =>
+            (b.user.name ?? '').toLowerCase() == author.toLowerCase() &&
+            author.isNotEmpty)
+        .toList();
   }
 
   Future saveBook({required String userId, required String bookId}) async {
@@ -37,6 +48,62 @@ class BookController extends GetxController {
     } catch (e) {
       print(e);
       isInProcess.value = false;
+      return 500;
+    }
+  }
+
+  _showSuccessSnackBar(BuildContext context) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: const Text(
+          'Book uploaded successfully!',
+          style: TextStyle(color: Colors.green),
+        ),
+        backgroundColor: Colors.green.shade100,
+      ),
+    );
+  }
+
+  _showErrorSnackBar(BuildContext context) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: const Text(
+          'Error occurred!',
+          style: TextStyle(color: Colors.red),
+        ),
+        backgroundColor: Colors.red.shade100,
+      ),
+    );
+  }
+
+  Future deleteBook(String id, String author, BuildContext context) async {
+    await EasyLoading.show();
+    try {
+      final SharedPreferences prefs = await SharedPreferences.getInstance();
+      final String? token = prefs.getString('token');
+
+      final response = await http.delete(
+        Uri.parse("$baseUrl/delete-book/$id"),
+        headers: {
+          'Accept': 'application/json',
+          'Authorization': "Bearer $token",
+        },
+      );
+      EasyLoading.dismiss();
+      final responseBody = response.body;
+      if (responseBody.isNotEmpty) {
+        await loadBooks();
+        findBooksByAuthor(author);
+        _showSuccessSnackBar(context);
+      }
+      final decodedData = json.decode(responseBody);
+
+      print(decodedData['data']);
+      return decodedData['data'];
+    } catch (e) {
+      _showErrorSnackBar(context);
+      EasyLoading.dismiss();
+      print(e);
       return 500;
     }
   }
