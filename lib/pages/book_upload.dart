@@ -1,9 +1,12 @@
 import 'dart:io';
 import 'package:book_sharing_app/model/book.dart';
+import 'package:book_sharing_app/model/user.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:book_sharing_app/controller/auth_controller.dart';
+
 
 class BookCreatePage extends StatefulWidget {
   const BookCreatePage({Key? key}) : super(key: key);
@@ -16,6 +19,8 @@ class _BookCreatePageState extends State<BookCreatePage> {
   TextEditingController nameController = TextEditingController();
   TextEditingController descriptionController = TextEditingController();
   TextEditingController reviewController = TextEditingController();
+  final AuthenticationController _authenticationController = Get.find();
+  String? profileImage;
   File? _photo;
   File? _book;
   int? status = 0; // 0 for private, 1 for public
@@ -45,11 +50,11 @@ class _BookCreatePageState extends State<BookCreatePage> {
   }
 
   _setUserInfo() async {
-    final userData = await User.getUser(token: token!);
+    final userData = await _authenticationController.getUser();
 
     setState(() {
       user = userData;
-      print(user);
+      profileImage = user?.profile?.public_path;
     });
   }
 
@@ -109,7 +114,7 @@ class _BookCreatePageState extends State<BookCreatePage> {
             children: [
               Container(
                 alignment: Alignment.topRight,
-                child: Text(user != null ? user!.name : 'User',
+                child: Text(user?.name ?? "",
                     style: const TextStyle(
                       color: Colors.black,
                       fontSize: 12,

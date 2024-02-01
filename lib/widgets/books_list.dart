@@ -16,10 +16,10 @@ class _BooksState extends State<Books> {
   @override
   void initState() {
     super.initState();
-    _loadBooks();
+    loadBooks();
   }
 
-  Future<void> _loadBooks() async {
+  Future<void> loadBooks() async {
     List<Book> fetchedBooks = await Book.getAllBooks();
     setState(() {
       books = fetchedBooks;
@@ -72,7 +72,7 @@ class _BooksState extends State<Books> {
                           height: 5,
                         ),
                         Text(
-                          books[index].user.name,
+                          books[index].user.name ?? "",
                           style: const TextStyle(
                               color: Colors.grey,
                               fontSize: 14,

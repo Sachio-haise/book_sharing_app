@@ -5,6 +5,7 @@ import 'package:book_sharing_app/constants/env.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:path/path.dart';
+import 'package:book_sharing_app/model/user.dart';
 
 class Book {
   String id;
@@ -154,50 +155,50 @@ class Photo {
   }
 }
 
-class User {
-  String id;
-  String name;
-  String email;
-  Profile profile;
-  String? description;
-  String createdAt;
-
-  User({
-    required this.id,
-    required this.name,
-    required this.email,
-    required this.profile,
-    required this.description,
-    required this.createdAt,
-  });
-
-  factory User.fromJson(Map<String, dynamic> json) {
-    return User(
-      id: json['id'].toString(),
-      name: json['name'],
-      email: json['email'],
-      profile: Profile.fromJson(json['profile']),
-      description: json['description'],
-      createdAt: json['created_at'],
-    );
-  }
-  static Future<User> getUser({required dynamic token}) async {
-    final response = await http.get(
-      Uri.parse('$baseUrl/user'),
-      headers: {
-        'Accept': 'application/json',
-        'Authorization': 'Bearer $token',
-      },
-    );
-    if (response.statusCode == 200) {
-      var data = json.decode(response.body);
-      User user = User.fromJson(data['data']);
-      return user;
-    } else {
-      throw Exception('Failed to load user');
-    }
-  }
-}
+// class User {
+//   String id;
+//   String name;
+//   String email;
+//   Profile profile;
+//   String? description;
+//   String createdAt;
+//
+//   User({
+//     required this.id,
+//     required this.name,
+//     required this.email,
+//     required this.profile,
+//     required this.description,
+//     required this.createdAt,
+//   });
+//
+//   factory User.fromJson(Map<String, dynamic> json) {
+//     return User(
+//       id: json['id'].toString(),
+//       name: json['name'],
+//       email: json['email'],
+//       profile: Profile.fromJson(json['profile']),
+//       description: json['description'],
+//       createdAt: json['created_at'],
+//     );
+//   }
+//   static Future<User> getUser({required dynamic token}) async {
+//     final response = await http.get(
+//       Uri.parse('$baseUrl/user'),
+//       headers: {
+//         'Accept': 'application/json',
+//         'Authorization': 'Bearer $token',
+//       },
+//     );
+//     if (response.statusCode == 200) {
+//       var data = json.decode(response.body);
+//       User user = User.fromJson(data['data']);
+//       return user;
+//     } else {
+//       throw Exception('Failed to load user');
+//     }
+//   }
+// }
 
 class Profile {
   String id;
