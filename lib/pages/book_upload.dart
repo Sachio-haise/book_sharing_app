@@ -73,7 +73,7 @@ class _BookCreatePageState extends State<BookCreatePage> {
   Future<void> _uploadBookFile() async {
     //apicall
     try {
-      Book.createBook(
+      final res = await Book.createBook(
           userId: user!.id.toString(),
           name: nameController.text,
           description: descriptionController.text,
@@ -81,7 +81,7 @@ class _BookCreatePageState extends State<BookCreatePage> {
           photo: _photo!,
           book: _book!,
           status: status.toString());
-      Navigator.pushReplacementNamed(context, '/');
+      print("we got the result ${res}");
     } catch (e) {
       print(e);
     }
