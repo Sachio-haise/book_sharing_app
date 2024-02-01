@@ -4,6 +4,8 @@ import 'package:book_sharing_app/widgets/reading_card_list.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
+import '../controller/book_controller.dart';
+
 class CardRow extends StatefulWidget {
   const CardRow({Key? key}) : super(key: key);
 
@@ -12,48 +14,44 @@ class CardRow extends StatefulWidget {
 }
 
 class _CardRowState extends State<CardRow> {
-  Future<List<Book>> _getBooks() async {
-    // Make API call to get all books
-    List<Book> books = await Book.getAllBooks();
-    return books;
-  }
+  final _bookController = Get.put(BookController());
 
   @override
   Widget build(BuildContext context) {
-    return FutureBuilder<List<Book>>(
-      future: _getBooks(),
-      builder: (context, snapshot) {
-        if (snapshot.hasData) {
-          List<Book> books = snapshot.data!;
-          return ListView.builder(
-            shrinkWrap: true,
-            scrollDirection: Axis.horizontal,
-            itemCount: books.length,
-            itemBuilder: (context, index) {
-              Book book = books[index];
-              return ReadingListCard(
-                image: book.photo.publicPath,
+    final books = _bookController.books;
+    return Obx(() {
+      if (books.isEmpty) {
+        return const Center(child: Text('No Popular Books!'));
+      }
+      return ListView.builder(
+        shrinkWrap: true,
+        scrollDirection: Axis.horizontal,
+        itemCount: books.length,
+        itemBuilder: (context, index) {
+          Book book = books[index];
+          return ReadingListCard(
+            image: book.photo.publicPath,
+            title: book.name,
+            auth: book.user.name ?? "",
+            rating: book.reactions,
+            pressDetails: () {
+              //go to book details page
+              Navigator.pushNamed(context, '/book_details', arguments: book);
+              Get.to(BookDetails(
+                id: book.id,
+                image: book.photo,
                 title: book.name,
-                auth: book.user.name ?? "",
-                rating: book.reactions,
-                pressDetails: () {
-                  //go to book details page
-                  Navigator.pushNamed(context, '/book_details',
-                      arguments: book);
-                  Get.to(BookDetails(id:book.id, image: book.photo, title: book.name, description: book.description, author: book.user.name ?? "", pdf: book.book,));
-                },
-                pressRead: () {
-                  // Handle press read
-                },
-              );
+                description: book.description,
+                author: book.user.name ?? "",
+                pdf: book.book,
+              ));
+            },
+            pressRead: () {
+              // Handle press read
             },
           );
-        } else if (snapshot.hasError) {
-          return Text('Error: ${snapshot.error}');
-        } else {
-          return const Center(child: CircularProgressIndicator());
-        }
-      },
-    );
+        },
+      );
+    });
   }
 }

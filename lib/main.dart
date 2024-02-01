@@ -46,13 +46,13 @@ void configLoading() {
   EasyLoading.instance
     ..displayDuration = const Duration(milliseconds: 2000)
     ..indicatorType = EasyLoadingIndicatorType.cubeGrid
-    ..loadingStyle = EasyLoadingStyle.light
+    ..loadingStyle = EasyLoadingStyle.custom
     ..indicatorSize = 45.0
     ..radius = 10.0
     ..progressColor = Colors.yellow
-    ..backgroundColor = Colors.white
-    ..indicatorColor = Colors.green
-    ..textColor = Colors.green
+    ..backgroundColor = Colors.green
+    ..indicatorColor = Colors.white
+    ..textColor = Colors.white
     ..maskColor = Colors.blue.withOpacity(0.5)
     ..userInteractions = false
     ..dismissOnTap = false;

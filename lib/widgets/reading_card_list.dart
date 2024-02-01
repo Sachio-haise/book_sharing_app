@@ -51,7 +51,7 @@ class ReadingListCard extends StatelessWidget {
           ),
           CachedNetworkImage(
             imageUrl: image,
-            width: 150,
+            width: 202,
             errorWidget: (_, __, ___) {
               return const Center(
                 child: Icon(
@@ -61,21 +61,21 @@ class ReadingListCard extends StatelessWidget {
               );
             },
           ),
-          Positioned(
-            top: 35,
-            right: 10,
-            child: Column(
-              children: <Widget>[
-                IconButton(
-                  icon: const Icon(
-                    Icons.favorite_border,
-                  ),
-                  onPressed: () {},
-                ),
-                BookRating(score: rating),
-              ],
-            ),
-          ),
+          // Positioned(
+          //   top: 35,
+          //   right: 10,
+          //   child: Column(
+          //     children: <Widget>[
+          //       IconButton(
+          //         icon: const Icon(
+          //           Icons.favorite_border,
+          //         ),
+          //         onPressed: () {},
+          //       ),
+          //       BookRating(score: rating),
+          //     ],
+          //   ),
+          // ),
           Positioned(
             top: 160,
             child: SizedBox(
@@ -116,13 +116,13 @@ class ReadingListCard extends StatelessWidget {
                           width: 101,
                           padding: const EdgeInsets.symmetric(vertical: 10),
                           alignment: Alignment.center,
-                          child: const Text("Details"),
+                          // child: const Text("Details"),
                         ),
                       ),
                       Expanded(
                         child: TwoSideRoundedButton(
-                          text: "Read",
-                          press: pressRead,
+                          text: "Details",
+                          press: pressDetails as void Function(),
                         ),
                       )
                     ],

@@ -109,40 +109,43 @@ class _AuthPageState extends State<AuthPage> {
                                     .validationErrors['password'] ??
                                 '',
                           )),
-                      ElevatedButton(
-                        onPressed: () async {
-                          if (_formKey.currentState!.validate()) {}
-                          await _authenticationController.authorize(
-                              name: _nameController.text.trim(),
-                              email: _emailController.text.trim(),
-                              password: _passwordController.text.trim(),
-                              isSignIn: _isSignIn);
-                        },
-                        style: ElevatedButton.styleFrom(
-                          foregroundColor: Colors.green,
-                        ),
-                        child: Obx(() {
-                          return _authenticationController.isLoading.value
-                              ? const Row(
-                                  mainAxisSize: MainAxisSize.min,
-                                  children: [
-                                    Text('Processing'),
-                                    SizedBox(width: 5.0),
-                                    SizedBox(
-                                      width: 15.0,
-                                      height: 15.0,
-                                      child: CircularProgressIndicator(
-                                        color: Colors.green,
-                                        strokeWidth: 3.0,
+                      SizedBox(
+                        width: double.maxFinite,
+                        child: ElevatedButton(
+                          onPressed: () async {
+                            if (_formKey.currentState!.validate()) {}
+                            await _authenticationController.authorize(
+                                name: _nameController.text.trim(),
+                                email: _emailController.text.trim(),
+                                password: _passwordController.text.trim(),
+                                isSignIn: _isSignIn);
+                          },
+                          style: ElevatedButton.styleFrom(
+                            foregroundColor: Colors.green,
+                          ),
+                          child: Obx(() {
+                            return _authenticationController.isLoading.value
+                                ? const Row(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      Text('Processing'),
+                                      SizedBox(width: 5.0),
+                                      SizedBox(
+                                        width: 15.0,
+                                        height: 15.0,
+                                        child: CircularProgressIndicator(
+                                          color: Colors.green,
+                                          strokeWidth: 3.0,
+                                        ),
                                       ),
-                                    ),
-                                  ],
-                                )
-                              : Text(
-                                  _isSignIn ? "Login" : "Register",
-                                  style: const TextStyle(color: Colors.green),
-                                );
-                        }),
+                                    ],
+                                  )
+                                : Text(
+                                    _isSignIn ? "Login" : "Register",
+                                    style: const TextStyle(color: Colors.green),
+                                  );
+                          }),
+                        ),
                       ),
                       const SizedBox(
                         height: 10,

@@ -5,11 +5,18 @@ import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
 
+import '../model/book.dart';
+
 class BookController extends GetxController {
   final isInProcess = false.obs;
+  RxList<Book> books = <Book>[].obs;
+  Future<void> loadBooks() async {
+    List<Book> fetchedBooks = await Book.getAllBooks();
+    books.value = fetchedBooks;
+  }
 
   Future saveBook({required String userId, required String bookId}) async {
-    if(isInProcess.value) return;
+    if (isInProcess.value) return;
     isInProcess.value = true;
     try {
       final SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -47,8 +54,7 @@ class BookController extends GetxController {
             'Accept': 'application/json',
             'Authorization': "Bearer $token",
           },
-          body: data
-      );
+          body: data);
 
       final responseBody = response.body;
       final decodedData = json.decode(responseBody);

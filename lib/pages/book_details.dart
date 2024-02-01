@@ -154,50 +154,24 @@ class _BookDetailsState extends State<BookDetails> {
             //book details ratting,author,discription
             Padding(
               padding: const EdgeInsets.only(left: 14.0, right: 14.0),
-              child: Container(
-                decoration: const BoxDecoration(
-                  color: Color(0xFF2EC05E),
-                  borderRadius: BorderRadius.all(Radius.circular(5)),
-                ),
-                child: Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceAround,
-                    children: [
-                      Column(
-                        children: [
-                          Text(
-                            "Authors ${user?.id}",
-                            style: TextStyle(
-                                fontWeight: FontWeight.bold,
-                                color: Colors.white),
-                          ),
-                          Text(
-                            widget.author,
-                            style: const TextStyle(
-                                fontWeight: FontWeight.bold,
-                                color: Colors.white),
-                          )
-                        ],
-                      ),
-                      const Column(
-                        children: [
-                          Text(
-                            "Like",
-                            style: TextStyle(
-                                fontWeight: FontWeight.bold,
-                                color: Colors.white),
-                          ),
-                          Text(
-                            "140",
-                            style: TextStyle(
-                                fontWeight: FontWeight.bold,
-                                color: Colors.white),
-                          )
-                        ],
-                      ),
-                    ],
-                  ),
+              child: Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Row(
+                      children: [
+                        const Icon(
+                          Icons.account_circle,
+                        ),
+                        const SizedBox(width: 10),
+                        Text(
+                          widget.author,
+                          style: const TextStyle(fontWeight: FontWeight.bold),
+                        )
+                      ],
+                    ),
+                  ],
                 ),
               ),
             ),
@@ -214,7 +188,7 @@ class _BookDetailsState extends State<BookDetails> {
                 padding: const EdgeInsets.only(left: 24.0, right: 24.0),
                 child: SizedBox(
                   child: ReadMoreText(
-                    "${widget.description} .'This is a msg from AKM.Try To Download this pdf to save in the user phoen'. ${widget.pdf.publicPath}",
+                    "${widget.description}\n\nTry To Download this pdf to save in the user phone'.\n ${widget.pdf.publicPath}",
                     trimLines: 5,
                     textAlign: TextAlign.justify,
                     trimMode: TrimMode.Line,
