@@ -312,72 +312,75 @@ class _TabSectionState extends State<TabSection> {
                                   maxLines: 3,
                                   minLines: 2,
                                   validateText: ""),
-                              PrettyShadowButton(
-                                label: "Pretty Shadow Button",
-                                onPressed: () async {
-                                  if (_formKey.currentState!.validate()) {}
-                                  final response =
-                                      await _authenticationController
-                                          .updateProfile(
-                                    name: _nameController.text.trim(),
-                                    email: _emailController.text.trim(),
-                                    description:
-                                        _descriptionController.text.trim(),
-                                    id: id,
-                                  );
-                                  print(response);
-                                  if (response == 200) {
-                                    _setUserInfo();
-                                    widget.setUserProfileInfo();
-                                  }
-                                },
-                                icon: Icons.arrow_forward,
-                                shadowColor: Colors.green,
-                              ),
-                              ElevatedButton(
-                                onPressed: () async {
-                                  if (_formKey.currentState!.validate()) {}
-                                  final response =
-                                      await _authenticationController
-                                          .updateProfile(
-                                    name: _nameController.text.trim(),
-                                    email: _emailController.text.trim(),
-                                    description:
-                                        _descriptionController.text.trim(),
-                                    id: id,
-                                  );
-                                  print(response);
-                                  if (response == 200) {
-                                    _setUserInfo();
-                                    widget.setUserProfileInfo();
-                                  }
-                                },
-                                style: ElevatedButton.styleFrom(
-                                  foregroundColor: Colors.green,
-                                ),
-                                child: Obx(() {
-                                  return _authenticationController
-                                          .isLoading.value
-                                      ? const Row(
-                                          mainAxisSize: MainAxisSize.min,
-                                          children: [
-                                            Text('Processing'),
-                                            SizedBox(width: 5.0),
-                                            SizedBox(
-                                              width: 15.0,
-                                              height: 15.0,
-                                              child: CircularProgressIndicator(
-                                                color: Colors.green,
-                                                strokeWidth: 3.0,
+                              // PrettyShadowButton(
+                              //   label: "Pretty Shadow Button",
+                              //   onPressed: () async {
+                              //     if (_formKey.currentState!.validate()) {}
+                              //     final response =
+                              //         await _authenticationController
+                              //             .updateProfile(
+                              //       name: _nameController.text.trim(),
+                              //       email: _emailController.text.trim(),
+                              //       description:
+                              //           _descriptionController.text.trim(),
+                              //       id: id,
+                              //     );
+                              //     print(response);
+                              //     if (response == 200) {
+                              //       _setUserInfo();
+                              //       widget.setUserProfileInfo();
+                              //     }
+                              //   },
+                              //   icon: Icons.arrow_forward,
+                              //   shadowColor: Colors.green,
+                              // ),
+                              SizedBox(
+                                width: double.maxFinite,
+                                child: ElevatedButton(
+                                  onPressed: () async {
+                                    if (_formKey.currentState!.validate()) {}
+                                    final response =
+                                        await _authenticationController
+                                            .updateProfile(
+                                      name: _nameController.text.trim(),
+                                      email: _emailController.text.trim(),
+                                      description:
+                                          _descriptionController.text.trim(),
+                                      id: id,
+                                    );
+                                    print(response);
+                                    if (response == 200) {
+                                      _setUserInfo();
+                                      widget.setUserProfileInfo();
+                                    }
+                                  },
+                                  style: ElevatedButton.styleFrom(
+                                    foregroundColor: Colors.green,
+                                  ),
+                                  child: Obx(() {
+                                    return _authenticationController
+                                            .isLoading.value
+                                        ? const Row(
+                                            mainAxisSize: MainAxisSize.min,
+                                            children: [
+                                              Text('Processing'),
+                                              SizedBox(width: 5.0),
+                                              SizedBox(
+                                                width: 15.0,
+                                                height: 15.0,
+                                                child: CircularProgressIndicator(
+                                                  color: Colors.green,
+                                                  strokeWidth: 3.0,
+                                                ),
                                               ),
-                                            ),
-                                          ],
-                                        )
-                                      : const Text(
-                                          "Update",
-                                          style: TextStyle(color: Colors.green),
-                                        );
-                                }),
+                                            ],
+                                          )
+                                        : const Text(
+                                            "Update",
+                                            style: TextStyle(color: Colors.green),
+                                          );
+                                  }),
+                                ),
                               ),
                             ],
                           )),
@@ -416,49 +419,52 @@ class _TabSectionState extends State<TabSection> {
                                   validateText: _authenticationController
                                           .validationErrors['password'] ??
                                       '')),
-                              ElevatedButton(
-                                onPressed: () async {
-                                  if (_formKey.currentState!.validate()) {}
-                                  final response =
-                                      await _authenticationController
-                                          .changePassword(
-                                    password: _passwordController.text.trim(),
-                                    oldPassword:
-                                        _oldPasswordController.text.trim(),
-                                    id: id,
-                                  );
-                                  print(response);
-                                  if (response == 200) {
-                                    _setUserInfo();
-                                    widget.setUserProfileInfo();
-                                  }
-                                },
-                                style: ElevatedButton.styleFrom(
-                                  foregroundColor: Colors.green,
-                                ),
-                                child: Obx(() {
-                                  return _authenticationController
-                                          .isUpdating.value
-                                      ? const Row(
-                                          mainAxisSize: MainAxisSize.min,
-                                          children: [
-                                            Text('Processing'),
-                                            SizedBox(width: 5.0),
-                                            SizedBox(
-                                              width: 15.0,
-                                              height: 15.0,
-                                              child: CircularProgressIndicator(
-                                                color: Colors.green,
-                                                strokeWidth: 3.0,
+                              SizedBox(
+                                width: double.maxFinite,
+                                child: ElevatedButton(
+                                  onPressed: () async {
+                                    if (_formKey.currentState!.validate()) {}
+                                    final response =
+                                        await _authenticationController
+                                            .changePassword(
+                                      password: _passwordController.text.trim(),
+                                      oldPassword:
+                                          _oldPasswordController.text.trim(),
+                                      id: id,
+                                    );
+                                    print(response);
+                                    if (response == 200) {
+                                      _setUserInfo();
+                                      widget.setUserProfileInfo();
+                                    }
+                                  },
+                                  style: ElevatedButton.styleFrom(
+                                    foregroundColor: Colors.green,
+                                  ),
+                                  child: Obx(() {
+                                    return _authenticationController
+                                            .isUpdating.value
+                                        ? const Row(
+                                            mainAxisSize: MainAxisSize.min,
+                                            children: [
+                                              Text('Processing'),
+                                              SizedBox(width: 5.0),
+                                              SizedBox(
+                                                width: 15.0,
+                                                height: 15.0,
+                                                child: CircularProgressIndicator(
+                                                  color: Colors.green,
+                                                  strokeWidth: 3.0,
+                                                ),
                                               ),
-                                            ),
-                                          ],
-                                        )
-                                      : const Text(
-                                          "Confirm",
-                                          style: TextStyle(color: Colors.green),
-                                        );
-                                }),
+                                            ],
+                                          )
+                                        : const Text(
+                                            "Confirm",
+                                            style: TextStyle(color: Colors.green),
+                                          );
+                                  }),
+                                ),
                               ),
                             ],
                           )),
@@ -474,8 +480,7 @@ class _TabSectionState extends State<TabSection> {
                         },
                         style: ElevatedButton.styleFrom(
                             primary: Colors.red[600],
-                            shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(5.0))),
+                            ),
                         child: const SizedBox(
                           width: double.infinity,
                           child: Center(

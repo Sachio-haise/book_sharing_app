@@ -145,7 +145,7 @@ class _HomePageState extends State<HomePage> {
               const Books()
             ],
           ),
-          ProfilePage(),
+          const ProfilePage(),
         ],
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
@@ -154,7 +154,12 @@ class _HomePageState extends State<HomePage> {
           borderRadius: BorderRadius.circular(50),
         ),
         backgroundColor: Colors.green,
-        onPressed: _homeController.authenticate,
+        onPressed: () async {
+          final value = await _homeController.navigateToBookCreatePage();
+          if (value != null || value) {
+            _homeController.authenticate();
+          }
+        },
         child: const Icon(
           Icons.add,
           color: Colors.white,

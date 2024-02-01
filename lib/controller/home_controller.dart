@@ -16,4 +16,8 @@ class HomeController extends GetxController {
       Get.offAllNamed('/auth');
     }
   }
+  Future<dynamic> navigateToBookCreatePage() async{
+    final result = await Get.toNamed('/upload');
+    return result;
+  }
 }

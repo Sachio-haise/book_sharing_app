@@ -106,7 +106,6 @@ class _BookCreatePageState extends State<BookCreatePage> {
           book: _book!,
           status: status.toString());
       if (res != null) {
-        Get.back();
         _showSuccessSnackBar(context);
       }
       print("we got the result ${res}");
@@ -128,12 +127,13 @@ class _BookCreatePageState extends State<BookCreatePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+          backgroundColor: Colors.grey[200],
           centerTitle: true,
           title: const Text('Book Upload'),
           leading: IconButton(
               icon: const Icon(Icons.arrow_back),
               onPressed: () {
-                Get.offAllNamed('/');
+                Get.back(result: true);
               })),
       body: SingleChildScrollView(
         scrollDirection: Axis.vertical,
@@ -143,12 +143,21 @@ class _BookCreatePageState extends State<BookCreatePage> {
             children: [
               Container(
                 alignment: Alignment.topRight,
-                child: Text(user?.name ?? "",
-                    style: const TextStyle(
-                      color: Colors.black,
-                      fontSize: 12,
-                      fontWeight: FontWeight.bold,
-                    )),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(Icons.account_circle),
+                    const SizedBox(width: 10),
+                    Text(
+                      user?.name ?? "",
+                      style: const TextStyle(
+                        color: Colors.black,
+                        fontSize: 12,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ],
+                ),
               ),
               TextField(
                 controller: nameController,
@@ -172,7 +181,7 @@ class _BookCreatePageState extends State<BookCreatePage> {
               GestureDetector(
                 onTap: _uploadPhoto,
                 child: Container(
-                    margin: const EdgeInsets.all(8.0),
+                    margin: const EdgeInsets.symmetric(vertical: 8.0),
                     height: 150,
                     width: MediaQuery.sizeOf(context).width,
                     decoration: BoxDecoration(
@@ -221,7 +230,6 @@ class _BookCreatePageState extends State<BookCreatePage> {
                   }
                 },
                 child: Container(
-                  margin: const EdgeInsets.all(8.0),
                   height: 100,
                   width: MediaQuery.sizeOf(context).width,
                   decoration: BoxDecoration(
@@ -277,12 +285,15 @@ class _BookCreatePageState extends State<BookCreatePage> {
                   ],
                 ),
               ),
-              ElevatedButton(
-                onPressed: () async {
-                  await _uploadBookFile(context);
-                },
-                child: const Text('Upload Book',
-                    style: TextStyle(fontSize: 20, color: Colors.green)),
+              SizedBox(
+                width: double.maxFinite,
+                child: ElevatedButton(
+                  onPressed: () async {
+                    await _uploadBookFile(context);
+                  },
+                  child: const Text('Upload Book',
+                      style: TextStyle(color: Colors.green)),
+                ),
               ),
             ],
           ),
