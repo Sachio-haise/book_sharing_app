@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'dart:typed_data';
+import 'package:book_sharing_app/controller/book_controller.dart';
 import 'package:book_sharing_app/model/user.dart';
 import 'package:book_sharing_app/widgets/input_form_widget.dart';
 import 'package:flutter/material.dart';
@@ -9,6 +10,8 @@ import 'package:book_sharing_app/controller/auth_controller.dart';
 import 'package:flutter/foundation.dart';
 import 'package:pretty_animated_buttons/pretty_animated_buttons.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+
+import '../model/book.dart';
 
 class ProfilePage extends StatefulWidget {
   const ProfilePage({Key? key}) : super(key: key);
@@ -20,8 +23,7 @@ class ProfilePage extends StatefulWidget {
 class _ProfilePageState extends State<ProfilePage> {
   Uint8List? _image;
   File? selectedImage;
-  String? profileImage;
-  User? user;
+
   final AuthenticationController _authenticationController =
       Get.put(AuthenticationController());
 
@@ -34,62 +36,14 @@ class _ProfilePageState extends State<ProfilePage> {
   }
 
   _setUserInfo() async {
-    final userData = await _authenticationController.getUser();
-
-    setState(() {
-      user = userData;
-      profileImage = user?.profile?.public_path;
-    });
+    await _authenticationController.fetchUserData();
+    print("authentication ${_authenticationController.user?.name}");
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        backgroundColor: Colors.grey[200],
-        leading:   InkWell(
-            onTap: (){
-              Get.toNamed('/');
-            },
-            child:  const Icon(Icons.arrow_back)
-        ),
-        title: const Center(
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              Image(
-                image: AssetImage('assets/images/logo_.png'),
-                width: 30.0,
-                height: 30.0,
-              ),
-              Text(
-                'Book Library',
-                style:
-                    TextStyle(color: Colors.green, fontWeight: FontWeight.bold),
-              ),
-            ],
-          ),
-        ),
-        actions: [
-          Padding(
-            padding: const EdgeInsets.only(right: 16.0, top: 8.0),
-            child: InkWell(
-              onTap: () {
-                Get.toNamed('/profile');
-              },
-              child: CircleAvatar(
-                radius: 20,
-                backgroundImage: profileImage != null
-                    ? NetworkImage("$profileImage")
-                    : NetworkImage("https://img6.arthub.ai/6497fccf-d831.webp"),
-              ),
-            ),
-          ),
-        ],
-        toolbarHeight: kToolbarHeight + 20,
-      ),
-      body: SingleChildScrollView(
+    return GetBuilder<AuthenticationController>(builder: (context) {
+      return SingleChildScrollView(
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
@@ -107,8 +61,10 @@ class _ProfilePageState extends State<ProfilePage> {
                             minRadius: 60.0,
                           )
                         : CircleAvatar(
-                            foregroundImage: profileImage != null
-                                ? NetworkImage("$profileImage")
+                            foregroundImage: _authenticationController.profileImage !=
+                                    null
+                                ? NetworkImage(
+                                    "${_authenticationController.profileImage}")
                                 : const NetworkImage(
                                     "https://img6.arthub.ai/6497fccf-d831.webp"),
                             minRadius: 60.0,
@@ -142,11 +98,11 @@ class _ProfilePageState extends State<ProfilePage> {
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     Text(
-                      user?.name ?? "",
+                      _authenticationController.user?.name ?? "",
                       style: const TextStyle(
                         color: Colors.green,
                         fontWeight: FontWeight.bold,
-                        fontSize: 20.0,
+                        fontSize: 22.0,
                       ),
                     ),
                     const Padding(
@@ -163,7 +119,7 @@ class _ProfilePageState extends State<ProfilePage> {
                     Padding(
                       padding: const EdgeInsets.only(left: 8.0),
                       child: Text(
-                        user?.created_at ?? "",
+                        _authenticationController.user?.created_at ?? "",
                         style: const TextStyle(
                           fontSize: 16.0,
                           fontWeight: FontWeight.w600,
@@ -181,27 +137,30 @@ class _ProfilePageState extends State<ProfilePage> {
                 style: TextStyle(
                     fontSize: 16,
                     color: Colors.green,
-                    fontWeight: FontWeight.bold
-                ),
+                    fontWeight: FontWeight.bold),
               ),
             ),
             Padding(
               padding: const EdgeInsets.only(left: 20.0, right: 20.0),
               child: Text(
-                user?.description ?? "",
+                _authenticationController.user?.description ?? "",
                 style: const TextStyle(fontSize: 12.0, color: Colors.black54),
               ),
             ),
             const SizedBox(
               height: 15.0,
             ),
-            TabSection(
-              setUserProfileInfo: _setUserInfo,
+            Flexible(
+              child: SizedBox(
+                child: TabSection(
+                  setUserProfileInfo: _setUserInfo,
+                ),
+              ),
             )
           ],
         ),
-      ),
-    );
+      );
+    });
   }
 
   Future _pickImage() async {
@@ -216,9 +175,8 @@ class _ProfilePageState extends State<ProfilePage> {
     });
 
     final response = await _authenticationController.uploadProfile(
-         id: "${user?.id}",
-        image: File(returnImage.path)
-    );
+        id: "${_authenticationController.user?.id}",
+        image: File(returnImage.path));
     print("we got the code like $response");
     if (response == 200) {
       _setUserInfo();
@@ -229,8 +187,7 @@ class _ProfilePageState extends State<ProfilePage> {
           timeInSecForIosWeb: 1,
           backgroundColor: Colors.red,
           textColor: Colors.white,
-          fontSize: 16.0
-      );
+          fontSize: 16.0);
     }
   }
 }
@@ -269,10 +226,9 @@ class _TabSectionState extends State<TabSection> {
     setState(() {
       _nameController.text = user.name ?? '';
       _emailController.text = user.email ?? '';
-      _passwordController.text =
-          '';
+      _passwordController.text = '';
       _oldPasswordController.text =
-      '';// Assuming you don't want to display the password
+          ''; // Assuming you don't want to display the password
       _descriptionController.text = user.description ?? '';
       id = user.id;
     });
@@ -289,7 +245,6 @@ class _TabSectionState extends State<TabSection> {
           children: <Widget>[
             const TabBar(
               tabs: [
-
                 Padding(
                   padding: EdgeInsets.all(10.0),
                   child: Row(
@@ -297,7 +252,9 @@ class _TabSectionState extends State<TabSection> {
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       Text("Books"),
-                      SizedBox(width: 5,),
+                      SizedBox(
+                        width: 5,
+                      ),
                       Icon(Icons.book_rounded)
                     ],
                   ),
@@ -309,7 +266,9 @@ class _TabSectionState extends State<TabSection> {
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       Text("Setting"),
-                      SizedBox(width: 5,),
+                      SizedBox(
+                        width: 5,
+                      ),
                       Icon(Icons.settings)
                     ],
                   ),
@@ -322,24 +281,23 @@ class _TabSectionState extends State<TabSection> {
               //Add this to give height
               height: MediaQuery.of(context).size.height,
               child: TabBarView(children: [
-                Text("Articles Body"),
+                ManageBooks(),
                 Column(
                   children: [
-                    const SizedBox(height: 15.0,),
-                    const Text('Profile Information',
-                    style: TextStyle(
-                      fontSize: 20.0,
-                      color: Colors.green,
-                      fontWeight: FontWeight.bold,
-                      decoration: TextDecoration.underline,
-                      decorationColor: Colors.green
+                    const SizedBox(
+                      height: 15.0,
                     ),
+                    const Text(
+                      'Profile Information',
+                      style: TextStyle(
+                          fontSize: 20.0,
+                          color: Colors.green,
+                          fontWeight: FontWeight.bold,
+                          decoration: TextDecoration.underline,
+                          decorationColor: Colors.green),
                     ),
                     Padding(
-                      padding: const EdgeInsets.only(
-                          left:15.0,
-                          right: 15.0
-                      ),
+                      padding: const EdgeInsets.only(left: 15.0, right: 15.0),
                       child: Form(
                           key: _formKey,
                           child: Column(
@@ -348,13 +306,13 @@ class _TabSectionState extends State<TabSection> {
                                   controller: _nameController,
                                   hintText: "Name",
                                   validateText: _authenticationController
-                                      .validationErrors['name'] ??
+                                          .validationErrors['name'] ??
                                       '')),
                               Obx(() => InputFormWidget(
                                   controller: _emailController,
                                   hintText: "Email",
                                   validateText: _authenticationController
-                                      .validationErrors['email'] ??
+                                          .validationErrors['email'] ??
                                       '')),
                               InputFormWidget(
                                   controller: _descriptionController,
@@ -362,67 +320,77 @@ class _TabSectionState extends State<TabSection> {
                                   maxLines: 3,
                                   minLines: 2,
                                   validateText: ""),
-                              PrettyShadowButton(
-                                label: "Pretty Shadow Button",
-                                onPressed: () async {
-                                  if (_formKey.currentState!.validate()) {}
-                                  final response =
-                                  await _authenticationController.updateProfile(
-                                    name: _nameController.text.trim(),
-                                    email: _emailController.text.trim(),
-                                    description: _descriptionController.text.trim(),
-                                    id: id,
-                                  );
-                                  print(response);
-                                  if (response == 200) {
-                                    _setUserInfo();
-                                    widget.setUserProfileInfo();
-                                  }
-                                },
-                                icon: Icons.arrow_forward,
-                                shadowColor: Colors.green,
-                              ),
-                              ElevatedButton(
-                                onPressed: () async {
-                                  if (_formKey.currentState!.validate()) {}
-                                  final response =
-                                  await _authenticationController.updateProfile(
-                                    name: _nameController.text.trim(),
-                                    email: _emailController.text.trim(),
-                                    description: _descriptionController.text.trim(),
-                                    id: id,
-                                  );
-                                  print(response);
-                                  if (response == 200) {
-                                    _setUserInfo();
-                                    widget.setUserProfileInfo();
-                                  }
-                                },
-                                style: ElevatedButton.styleFrom(
-                                  foregroundColor: Colors.green,
+                              // PrettyShadowButton(
+                              //   label: "Pretty Shadow Button",
+                              //   onPressed: () async {
+                              //     if (_formKey.currentState!.validate()) {}
+                              //     final response =
+                              //         await _authenticationController
+                              //             .updateProfile(
+                              //       name: _nameController.text.trim(),
+                              //       email: _emailController.text.trim(),
+                              //       description:
+                              //           _descriptionController.text.trim(),
+                              //       id: id,
+                              //     );
+                              //     print(response);
+                              //     if (response == 200) {
+                              //       _setUserInfo();
+                              //       widget.setUserProfileInfo();
+                              //     }
+                              //   },
+                              //   icon: Icons.arrow_forward,
+                              //   shadowColor: Colors.green,
+                              // ),
+                              SizedBox(
+                                width: double.maxFinite,
+                                child: ElevatedButton(
+                                  onPressed: () async {
+                                    if (_formKey.currentState!.validate()) {}
+                                    final response =
+                                        await _authenticationController
+                                            .updateProfile(
+                                      name: _nameController.text.trim(),
+                                      email: _emailController.text.trim(),
+                                      description:
+                                          _descriptionController.text.trim(),
+                                      id: id,
+                                    );
+                                    print(response);
+                                    if (response == 200) {
+                                      _setUserInfo();
+                                      widget.setUserProfileInfo();
+                                    }
+                                  },
+                                  style: ElevatedButton.styleFrom(
+                                    foregroundColor: Colors.green,
+                                  ),
+                                  child: Obx(() {
+                                    return _authenticationController
+                                            .isLoading.value
+                                        ? const Row(
+                                            mainAxisSize: MainAxisSize.min,
+                                            children: [
+                                              Text('Processing'),
+                                              SizedBox(width: 5.0),
+                                              SizedBox(
+                                                width: 15.0,
+                                                height: 15.0,
+                                                child:
+                                                    CircularProgressIndicator(
+                                                  color: Colors.green,
+                                                  strokeWidth: 3.0,
+                                                ),
+                                              ),
+                                            ],
+                                          )
+                                        : const Text(
+                                            "Update",
+                                            style:
+                                                TextStyle(color: Colors.green),
+                                          );
+                                  }),
                                 ),
-                                child: Obx(() {
-                                  return _authenticationController.isLoading.value
-                                      ? const Row(
-                                    mainAxisSize: MainAxisSize.min,
-                                    children: [
-                                      Text('Processing'),
-                                      SizedBox(width: 5.0),
-                                      SizedBox(
-                                        width: 15.0,
-                                        height: 15.0,
-                                        child: CircularProgressIndicator(
-                                          color: Colors.green,
-                                          strokeWidth: 3.0,
-                                        ),
-                                      ),
-                                    ],
-                                  )
-                                      : const Text(
-                                    "Update",
-                                    style: TextStyle(color: Colors.green),
-                                  );
-                                }),
                               ),
                             ],
                           )),
@@ -432,20 +400,17 @@ class _TabSectionState extends State<TabSection> {
                       thickness: 1,
                       height: 30.0,
                     ),
-                    const Text('Change Password',
+                    const Text(
+                      'Change Password',
                       style: TextStyle(
                           fontSize: 20.0,
                           color: Colors.green,
                           fontWeight: FontWeight.bold,
                           decoration: TextDecoration.underline,
-                          decorationColor: Colors.green
-                      ),
+                          decorationColor: Colors.green),
                     ),
                     Padding(
-                      padding: const EdgeInsets.only(
-                          left:15.0,
-                          right: 15.0
-                      ),
+                      padding: const EdgeInsets.only(left: 15.0, right: 15.0),
                       child: Form(
                           key: _passwordFormKey,
                           child: Column(
@@ -455,97 +420,177 @@ class _TabSectionState extends State<TabSection> {
                                   hintText: "Old Password",
                                   obscureText: true,
                                   validateText: _authenticationController
-                                      .validationErrors['old_password'] ??
+                                          .validationErrors['old_password'] ??
                                       '')),
                               Obx(() => InputFormWidget(
                                   controller: _oldPasswordController,
                                   hintText: "New Password",
                                   obscureText: true,
                                   validateText: _authenticationController
-                                      .validationErrors['password'] ??
+                                          .validationErrors['password'] ??
                                       '')),
-
-                              ElevatedButton(
-                                onPressed: () async {
-                                  if (_formKey.currentState!.validate()) {}
-                                  final response =
-                                  await _authenticationController.changePassword(
-                                    password: _passwordController.text.trim(),
-                                    oldPassword: _oldPasswordController.text.trim(),
-                                    id: id,
-                                  );
-                                  print(response);
-                                  if (response == 200) {
-                                    _setUserInfo();
-                                    widget.setUserProfileInfo();
-                                  }
-                                },
-                                style: ElevatedButton.styleFrom(
-                                  foregroundColor: Colors.green,
+                              SizedBox(
+                                width: double.maxFinite,
+                                child: ElevatedButton(
+                                  onPressed: () async {
+                                    if (_formKey.currentState!.validate()) {}
+                                    final response =
+                                        await _authenticationController
+                                            .changePassword(
+                                      password: _passwordController.text.trim(),
+                                      oldPassword:
+                                          _oldPasswordController.text.trim(),
+                                      id: id,
+                                    );
+                                    print(response);
+                                    if (response == 200) {
+                                      _setUserInfo();
+                                      widget.setUserProfileInfo();
+                                    }
+                                  },
+                                  style: ElevatedButton.styleFrom(
+                                    foregroundColor: Colors.green,
+                                  ),
+                                  child: Obx(() {
+                                    return _authenticationController
+                                            .isUpdating.value
+                                        ? const Row(
+                                            mainAxisSize: MainAxisSize.min,
+                                            children: [
+                                              Text('Processing'),
+                                              SizedBox(width: 5.0),
+                                              SizedBox(
+                                                width: 15.0,
+                                                height: 15.0,
+                                                child:
+                                                    CircularProgressIndicator(
+                                                  color: Colors.green,
+                                                  strokeWidth: 3.0,
+                                                ),
+                                              ),
+                                            ],
+                                          )
+                                        : const Text(
+                                            "Confirm",
+                                            style:
+                                                TextStyle(color: Colors.green),
+                                          );
+                                  }),
                                 ),
-                                child: Obx(() {
-                                  return _authenticationController.isUpdating.value
-                                      ? const Row(
-                                    mainAxisSize: MainAxisSize.min,
-                                    children: [
-                                      Text('Processing'),
-                                      SizedBox(width: 5.0),
-                                      SizedBox(
-                                        width: 15.0,
-                                        height: 15.0,
-                                        child: CircularProgressIndicator(
-                                          color: Colors.green,
-                                          strokeWidth: 3.0,
-                                        ),
-                                      ),
-                                    ],
-                                  )
-                                      : const Text(
-                                    "Confirm",
-                                    style: TextStyle(color: Colors.green),
-                                  );
-                                }),
                               ),
                             ],
                           )),
                     ),
-
                     const Divider(
                       color: Colors.red,
                       thickness: 1,
                       height: 30.0,
                     ),
                     ElevatedButton(
-                        onPressed: (){
+                        onPressed: () {
                           _authenticationController.logout();
                         },
                         style: ElevatedButton.styleFrom(
                           primary: Colors.red[600],
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(5.0)
-                          )
                         ),
                         child: const SizedBox(
                           width: double.infinity,
                           child: Center(
                             child: Text(
-                                "Logout",
-                               style: TextStyle(
-                                 color: Colors.white,
-                                 fontWeight: FontWeight.bold
-                               ),
+                              "Logout",
+                              style: TextStyle(
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.bold),
                             ),
                           ),
-                        )
-                    )
+                        ))
                   ],
-                )
-
+                ),
               ]),
             ),
           ],
         ),
       ),
     );
+  }
+}
+
+class ManageBooks extends StatefulWidget {
+  ManageBooks({
+    super.key,
+  });
+
+  @override
+  State<ManageBooks> createState() => _ManageBooksState();
+}
+
+class _ManageBooksState extends State<ManageBooks> {
+  final _authController = Get.find<AuthenticationController>();
+
+  final _bookController = Get.find<BookController>();
+
+  @override
+  void initState() {
+    super.initState();
+    findBooksByAuthor();
+  }
+
+  findBooksByAuthor() {
+    _bookController.findBooksByAuthor(_authController.user?.name ?? '');
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Obx(() {
+      return GridView.builder(
+        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+          crossAxisCount: 2,
+          childAspectRatio: 1.3,
+        ),
+        physics: const NeverScrollableScrollPhysics(),
+        shrinkWrap: true,
+        itemCount: _bookController.bookByAuthor.length,
+        itemBuilder: (context, index) {
+          final book = _bookController.bookByAuthor[index];
+          return Container(
+            margin: const EdgeInsets.all(4.0),
+            padding: const EdgeInsets.all(8.0),
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(12),
+              color: Colors.green.shade50,
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                Text(
+                  book.name,
+                  style: const TextStyle(fontWeight: FontWeight.w700),
+                  maxLines: 6,
+                ),
+                Text(
+                  book.description,
+                  maxLines: 3,
+                  overflow: TextOverflow.ellipsis,
+                ),
+                Align(
+                  alignment: Alignment.bottomRight,
+                  child: InkWell(
+                    onTap: () {
+                      _bookController.deleteBook(
+                          book.id, _authController.user?.name ?? '', context);
+                    },
+                    child: const Icon(
+                      Icons.delete,
+                      color: Colors.red,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          );
+        },
+      );
+    });
   }
 }

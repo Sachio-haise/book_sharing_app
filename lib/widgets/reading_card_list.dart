@@ -1,6 +1,7 @@
 import 'package:book_sharing_app/widgets/book_rating.dart';
 import 'package:book_sharing_app/widgets/consttants.dart';
 import 'package:book_sharing_app/widgets/two_side_rounded_button.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 
 class ReadingListCard extends StatelessWidget {
@@ -48,27 +49,33 @@ class ReadingListCard extends StatelessWidget {
               ),
             ),
           ),
-
-          //Network Image
-          Image.network(
-            image,
-            width: 150,
-          ),
-          Positioned(
-            top: 35,
-            right: 10,
-            child: Column(
-              children: <Widget>[
-                IconButton(
-                  icon: const Icon(
-                    Icons.favorite_border,
-                  ),
-                  onPressed: () {},
+          CachedNetworkImage(
+            imageUrl: image,
+            width: 202,
+            errorWidget: (_, __, ___) {
+              return const Center(
+                child: Icon(
+                  Icons.error,
+                  color: Colors.red,
                 ),
-                BookRating(score: rating),
-              ],
-            ),
+              );
+            },
           ),
+          // Positioned(
+          //   top: 35,
+          //   right: 10,
+          //   child: Column(
+          //     children: <Widget>[
+          //       IconButton(
+          //         icon: const Icon(
+          //           Icons.favorite_border,
+          //         ),
+          //         onPressed: () {},
+          //       ),
+          //       BookRating(score: rating),
+          //     ],
+          //   ),
+          // ),
           Positioned(
             top: 160,
             child: SizedBox(
@@ -109,13 +116,13 @@ class ReadingListCard extends StatelessWidget {
                           width: 101,
                           padding: const EdgeInsets.symmetric(vertical: 10),
                           alignment: Alignment.center,
-                          child: const Text("Details"),
+                          // child: const Text("Details"),
                         ),
                       ),
                       Expanded(
                         child: TwoSideRoundedButton(
-                          text: "Read",
-                          press: pressRead,
+                          text: "Details",
+                          press: pressDetails as void Function(),
                         ),
                       )
                     ],
