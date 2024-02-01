@@ -1,13 +1,21 @@
+import 'dart:convert';
+
+import 'package:book_sharing_app/controller/auth_controller.dart';
+import 'package:book_sharing_app/controller/book_controller.dart';
 import 'package:book_sharing_app/model/book.dart';
+import 'package:book_sharing_app/model/user.dart';
 import 'package:dio/dio.dart';
 import 'package:downloads_path_provider_28/downloads_path_provider_28.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:readmore/readmore.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class BookDetails extends StatefulWidget {
   const BookDetails({
     super.key,
+    required this.id,
     required this.image,
     required this.title,
     required this.description,
@@ -16,6 +24,7 @@ class BookDetails extends StatefulWidget {
   });
 
   final Photo image;
+  final String id;
   final String title;
   final String description;
   final String author;
@@ -26,8 +35,59 @@ class BookDetails extends StatefulWidget {
 
 class _BookDetailsState extends State<BookDetails> {
   String fileUrl = "https://fluttercampus.com/sample.pdf";
+  final AuthenticationController _authenticationController = Get.put(AuthenticationController());
+  final BookController _bookController = Get.put(BookController());
+  String? _token;
+  User? user;
+  bool isInCart = false;
+  String? profileImage;
 
-  String content = "whkat byJoe NelsonMonday 22 rdfghjmkhgfdsadgtfhujhgfdsadrgthuioygtedsadgtyujhyhjgfdsadfgthyujgftdsadgtythe Continental League Cup on Wednesday before hosting Aston Villa in the WSL on Sunday rdfghjmkhgfdsadgtfhujhgfdsadrgthuioygtedsadgtyujhyhjgfdsadfgthyujgftdsadgtythe Continental League Cup on Wednesday before hosting Aston Villa in the WSL on Sunday  away tobefore hosting away to Manchester City in rdfghjmkhgfdsadgtfhujhgfdsadrgthuioygtedsadgtyujhyhjgfdsadfgthyujgftdsadgtythe Continental League Cup on Wednesday before hosting Aston Villa in the WSL on Sundayrdfghjmkhgfdsadgtfhujhgfdsadrgthuioygtedsadgtyujhyhjgfdsadfgthyujgftdsadgtythe Continental League Cup on Wednesday before hosting Aston Villa in the WSL on Sunday  rdfghjmkhgfdsadgtfhujhgfdsadrgthuioygtedsadgtyujhyhjgfdsadfgthyujgftdsadgtythe Continental League Cup on Wednesday before hosting Aston Villa in the WSL on Sunday.";
+  @override
+  void initState() {
+    super.initState();
+    _loadToken();
+    _setUserInfo();
+  }
+
+  Future<void> _loadToken() async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    final String? token = prefs.getString('token');
+    setState(() {
+      _token = token; // No need for null check here
+    });
+
+  }
+
+  _setUserInfo() async {
+    final userData = await _authenticationController.getUser();
+
+    setState(() {
+      user = userData;
+      profileImage = user?.profile?.public_path;
+    });
+
+    print("we got user - > ${user?.name}");
+    if(user != null) await _getBookInfo();
+  }
+
+  Future _getBookInfo() async {
+    final bookInfo = await _bookController.getBookInfo(bookId:widget.id, userId: "${user?.id}");
+    print("This is book info ${bookInfo['isInCart']}");
+      setState(() {
+        isInCart = bookInfo['isInCart'];
+      });
+
+  }
+
+
+  Future _saveBook () async{
+    setState(() {
+      isInCart = !isInCart;
+    });
+    final res = await _bookController.saveBook(userId: "${user?.id}", bookId: widget.id);
+    await _getBookInfo();
+    print("this is book info $res");
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -38,8 +98,10 @@ class _BookDetailsState extends State<BookDetails> {
           Padding(
               padding: const EdgeInsets.only(right: 10),
               child: IconButton(
-                icon: const Icon(Icons.bookmark_add_outlined),
-                onPressed: () {},
+                icon: isInCart ? const Icon(Icons.bookmark) : const Icon(Icons.bookmark_add_outlined),
+                onPressed: () {
+                  _token != null ? _saveBook() : Get.toNamed('/auth');
+                },
               ))
         ],
       ),
@@ -90,8 +152,8 @@ class _BookDetailsState extends State<BookDetails> {
                     children: [
                       Column(
                         children: [
-                          const Text(
-                            "Authors",
+                          Text(
+                            "Authors ${user?.id}",
                             style: TextStyle(
                                 fontWeight: FontWeight.bold,
                                 color: Colors.white
