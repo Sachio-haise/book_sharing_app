@@ -6,6 +6,7 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:path/path.dart';
 import 'package:book_sharing_app/model/user.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class Book {
   String id;
@@ -62,40 +63,56 @@ class Book {
   }
 
   //Create Book
-  static Future<Book> createBook(
-      {required String userId,
+  static Future createBook(
+      {
+      required String userId,
       required String name,
       required String description,
       required String review,
       required File photo,
       required File book,
-      required String status}) async {
-    var request = http.MultipartRequest('POST', Uri.parse('$baseUrl/add-book'));
-    var stream = http.ByteStream(Stream.castFrom(photo.openRead()));
-    var length = await photo.length();
-    var multipartFile = http.MultipartFile('photo', stream, length,
-        filename: basename(photo.path));
-    var stream2 = http.ByteStream(Stream.castFrom(book.openRead()));
-    var length2 = await book.length();
-    var multipartFile2 = http.MultipartFile('book', stream2, length2,
-        filename: basename(book.path));
-    request.fields.addAll({
-      'user': userId,
-      'name': name,
-      'description': description,
-      'review': review,
-      'status': status
-    });
-    request.files.add(multipartFile);
-    request.files.add(multipartFile2);
-    var response = await request.send();
-    var responseData = await http.Response.fromStream(response);
-    if (response.statusCode == 200) {
-      var data = json.decode(responseData.body);
-      Book book = Book.fromJson(data['data']);
-      return book;
-    } else {
-      throw Exception('Failed to create book');
+      required String status
+      }
+      ) async {
+    try {
+      final SharedPreferences prefs = await SharedPreferences.getInstance();
+      final String? token = prefs.getString('token');
+
+      var request = http.MultipartRequest(
+          'POST', Uri.parse('$baseUrl/add-book'));
+      var stream = http.ByteStream(Stream.castFrom(photo.openRead()));
+      var length = await photo.length();
+      var multipartFile = http.MultipartFile('photo', stream, length,
+          filename: basename(photo.path));
+      var stream2 = http.ByteStream(Stream.castFrom(book.openRead()));
+      var length2 = await book.length();
+      var multipartFile2 = http.MultipartFile('book', stream2, length2,
+          filename: basename(book.path));
+      request.headers['Authorization'] = 'Bearer $token';
+
+      request.fields.addAll({
+        'user': userId,
+        'name': name,
+        'description': description,
+        'review': review,
+        'status': status
+      });
+      request.files.add(multipartFile);
+      request.files.add(multipartFile2);
+      var response = await request.send();
+      var responseData = await http.Response.fromStream(response);
+      if (response.statusCode == 201) {
+        var data = json.decode(responseData.body);
+        Book book = Book.fromJson(data['data']);
+        print(book.name);
+        return book;
+      } else {
+        throw Exception('Failed to create book');
+      }
+      print("hel ${response.statusCode}");
+    }catch(e){
+      print(e);
+      return 500;
     }
   }
 
