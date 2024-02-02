@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'dart:typed_data';
 import 'package:book_sharing_app/model/user.dart';
+import 'package:book_sharing_app/pages/cart.dart';
 import 'package:book_sharing_app/widgets/input_form_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -281,7 +282,7 @@ class _TabSectionState extends State<TabSection> {
   @override
   Widget build(BuildContext context) {
     return DefaultTabController(
-      length: 2,
+      length: 3,
       child: Padding(
         padding: const EdgeInsets.only(left: 15.0, right: 15.0),
         child: Column(
@@ -297,6 +298,19 @@ class _TabSectionState extends State<TabSection> {
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       Text("Books"),
+                      SizedBox(width: 5,),
+                      Icon(Icons.book_rounded)
+                    ],
+                  ),
+                ),
+
+                Padding(
+                  padding: EdgeInsets.all(10.0),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text("Carts"),
                       SizedBox(width: 5,),
                       Icon(Icons.book_rounded)
                     ],
@@ -323,6 +337,7 @@ class _TabSectionState extends State<TabSection> {
               height: MediaQuery.of(context).size.height,
               child: TabBarView(children: [
                 Text("Articles Body"),
+                Carts(),
                 Column(
                   children: [
                     const SizedBox(height: 15.0,),
