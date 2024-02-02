@@ -4,6 +4,7 @@ import 'package:book_sharing_app/controller/auth_controller.dart';
 import 'package:book_sharing_app/controller/book_controller.dart';
 import 'package:book_sharing_app/model/book.dart';
 import 'package:book_sharing_app/model/user.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:dio/dio.dart';
 import 'package:downloads_path_provider_28/downloads_path_provider_28.dart';
 import 'package:flutter/material.dart';
@@ -35,7 +36,8 @@ class BookDetails extends StatefulWidget {
 
 class _BookDetailsState extends State<BookDetails> {
   String fileUrl = "https://fluttercampus.com/sample.pdf";
-  final AuthenticationController _authenticationController = Get.put(AuthenticationController());
+  final AuthenticationController _authenticationController =
+      Get.put(AuthenticationController());
   final BookController _bookController = Get.put(BookController());
   String? _token;
   User? user;
@@ -55,7 +57,6 @@ class _BookDetailsState extends State<BookDetails> {
     setState(() {
       _token = token; // No need for null check here
     });
-
   }
 
   _setUserInfo() async {
@@ -67,24 +68,24 @@ class _BookDetailsState extends State<BookDetails> {
     });
 
     print("we got user - > ${user?.name}");
-    if(user != null) await _getBookInfo();
+    if (user != null) await _getBookInfo();
   }
 
   Future _getBookInfo() async {
-    final bookInfo = await _bookController.getBookInfo(bookId:widget.id, userId: "${user?.id}");
+    final bookInfo = await _bookController.getBookInfo(
+        bookId: widget.id, userId: "${user?.id}");
     print("This is book info ${bookInfo['isInCart']}");
-      setState(() {
-        isInCart = bookInfo['isInCart'];
-      });
-
+    setState(() {
+      isInCart = bookInfo['isInCart'];
+    });
   }
 
-
-  Future _saveBook () async{
+  Future _saveBook() async {
     setState(() {
       isInCart = !isInCart;
     });
-    final res = await _bookController.saveBook(userId: "${user?.id}", bookId: widget.id);
+    final res = await _bookController.saveBook(
+        userId: "${user?.id}", bookId: widget.id);
     await _getBookInfo();
     print("this is book info $res");
   }
@@ -98,7 +99,9 @@ class _BookDetailsState extends State<BookDetails> {
           Padding(
               padding: const EdgeInsets.only(right: 10),
               child: IconButton(
-                icon: isInCart ? const Icon(Icons.bookmark) : const Icon(Icons.bookmark_add_outlined),
+                icon: isInCart
+                    ? const Icon(Icons.bookmark)
+                    : const Icon(Icons.bookmark_add_outlined),
                 onPressed: () {
                   _token != null ? _saveBook() : Get.toNamed('/auth');
                 },
@@ -115,14 +118,25 @@ class _BookDetailsState extends State<BookDetails> {
               child: Padding(
                 padding: const EdgeInsets.all(15),
                 child: ClipRRect(
-                  borderRadius: BorderRadius.circular(15), // Adjust the border radius as needed
-                  child: Image.network(
-                    widget.image.publicPath,
-                    width: 300,
-                    height: 350,
-                    fit: BoxFit.cover, // Optional, to cover the entire container
-                  ),
-                ),
+                    borderRadius: BorderRadius.circular(
+                        15), // Adjust the border radius as needed
+                    child: CachedNetworkImage(
+                      imageUrl: widget.image.publicPath,
+                      width: 300,
+                      height: 350,
+                      fit: BoxFit.cover,
+                      errorWidget: (_, __, ___) {
+                        return Container(
+                          color: Colors.red.shade100,
+                          child: const Center(
+                            child: Icon(
+                              Icons.error,
+                              color: Colors.red,
+                            ),
+                          ),
+                        );
+                      },
+                    )),
               ),
             ),
             //for Book title document
@@ -130,7 +144,7 @@ class _BookDetailsState extends State<BookDetails> {
               padding: const EdgeInsets.only(bottom: 10.0, left: 24),
               child: Text(
                 widget.title,
-                style:const TextStyle(
+                style: const TextStyle(
                     color: Color(0xFF252435),
                     fontWeight: FontWeight.bold,
                     fontSize: 20.0),
@@ -140,55 +154,24 @@ class _BookDetailsState extends State<BookDetails> {
             //book details ratting,author,discription
             Padding(
               padding: const EdgeInsets.only(left: 14.0, right: 14.0),
-              child: Container(
-                decoration: const BoxDecoration(
-                  color: Color(0xFF2EC05E),
-                  borderRadius: BorderRadius.all(Radius.circular(5)),
-                ),
-                child: Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceAround,
-                    children: [
-                      Column(
-                        children: [
-                          Text(
-                            "Authors ${user?.id}",
-                            style: TextStyle(
-                                fontWeight: FontWeight.bold,
-                                color: Colors.white
-                            ),
-                          ),
-                          Text(
-                            widget.author,
-                            style: const TextStyle(
-                                fontWeight: FontWeight.bold,
-                                color: Colors.white
-                            ),
-                          )
-                        ],
-                      ),
-
-                      const Column(
-                        children: [
-                          Text(
-                            "Like",
-                            style: TextStyle(
-                                fontWeight: FontWeight.bold,
-                                color: Colors.white
-                            ),
-                          ),
-                          Text(
-                            "140",
-                            style: TextStyle(
-                                fontWeight: FontWeight.bold,
-                                color: Colors.white
-                            ),
-                          )
-                        ],
-                      ),
-                    ],
-                  ),
+              child: Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Row(
+                      children: [
+                        const Icon(
+                          Icons.account_circle,
+                        ),
+                        const SizedBox(width: 10),
+                        Text(
+                          widget.author,
+                          style: const TextStyle(fontWeight: FontWeight.bold),
+                        )
+                      ],
+                    ),
+                  ],
                 ),
               ),
             ),
@@ -202,24 +185,22 @@ class _BookDetailsState extends State<BookDetails> {
             SingleChildScrollView(
               scrollDirection: Axis.vertical,
               child: Padding(
-                padding: const EdgeInsets.only(left:24.0,right: 24.0),
+                padding: const EdgeInsets.only(left: 24.0, right: 24.0),
                 child: SizedBox(
-                  child: Expanded(
-                    child: ReadMoreText(
-                      "${widget.description} .'This is a msg from AKM.Try To Download this pdf to save in the user phoen'. ${widget.pdf.publicPath}" ,
-                      trimLines: 5,
-                      textAlign: TextAlign.justify,
-                      trimMode: TrimMode.Line,
-                      trimCollapsedText: "Read More",
-                      trimExpandedText: "Show Less",
-                      lessStyle: TextStyle(
-                          fontWeight: FontWeight.bold, color: Colors.grey[700]),
-                      moreStyle: const TextStyle(
-                        fontWeight: FontWeight.bold,
-                        color: Color(0xFF252435),
-                      ),
-                      style: const TextStyle(fontSize: 16),
+                  child: ReadMoreText(
+                    "${widget.description}\n\nTry To Download this pdf to save in the user phone'.\n ${widget.pdf.publicPath}",
+                    trimLines: 5,
+                    textAlign: TextAlign.justify,
+                    trimMode: TrimMode.Line,
+                    trimCollapsedText: "Read More",
+                    trimExpandedText: "Show Less",
+                    lessStyle: TextStyle(
+                        fontWeight: FontWeight.bold, color: Colors.grey[700]),
+                    moreStyle: const TextStyle(
+                      fontWeight: FontWeight.bold,
+                      color: Color(0xFF252435),
                     ),
+                    style: const TextStyle(fontSize: 16),
                   ),
                 ),
               ),
@@ -231,27 +212,25 @@ class _BookDetailsState extends State<BookDetails> {
         ),
       ),
       floatingActionButton: Padding(
-        padding: const EdgeInsets.only(left:28.0),
+        padding: const EdgeInsets.only(left: 28.0),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.end,
           children: [
             const Divider(),
             SizedBox(
               width: double.infinity,
-              child:    FilledButton(
+              child: FilledButton(
                 style: ButtonStyle(
                     backgroundColor:
-                    MaterialStateProperty.all(const Color(0xFF2EC05E)),
-                    shape:
-                    MaterialStateProperty.all<RoundedRectangleBorder>(
+                        MaterialStateProperty.all(const Color(0xFF2EC05E)),
+                    shape: MaterialStateProperty.all<RoundedRectangleBorder>(
                         RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(5)))),
                 onPressed: () async {
                   Map<Permission, PermissionStatus> statuses =
-                  await [Permission.storage].request();
+                      await [Permission.storage].request();
                   if (statuses[Permission.storage]!.isGranted) {
-                    var dir =
-                    await DownloadsPathProvider.downloadsDirectory;
+                    var dir = await DownloadsPathProvider.downloadsDirectory;
                     if (dir != null) {
                       String saveName = "file.pdf";
                       String savePath = dir.path + "/$saveName";
@@ -259,16 +238,14 @@ class _BookDetailsState extends State<BookDetails> {
                       try {
                         await Dio().download(fileUrl, savePath,
                             onReceiveProgress: (received, total) {
-                              if (total != -1) {
-                                print((received / total * 100)
-                                    .toStringAsFixed(0) +
-                                    "%");
-                              }
-                            });
+                          if (total != -1) {
+                            print((received / total * 100).toStringAsFixed(0) +
+                                "%");
+                          }
+                        });
                         print("File is saved to download folder: ");
                         ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(
-                                content: Text("File Downloaded")));
+                            const SnackBar(content: Text("File Downloaded")));
                       } on DioException catch (e) {
                         print(e.message);
                       }
@@ -276,8 +253,7 @@ class _BookDetailsState extends State<BookDetails> {
                   } else {
                     print("No Permission to read and write");
                     ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(
-                            content: Text("Permission Denied")));
+                        const SnackBar(content: Text("Permission Denied")));
                   }
                 },
                 child: const Text(

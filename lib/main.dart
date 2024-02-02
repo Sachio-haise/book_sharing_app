@@ -5,6 +5,7 @@ import 'package:book_sharing_app/pages/auth.dart';
 import 'package:book_sharing_app/pages/profile.dart';
 import 'package:book_sharing_app/pages/book_details.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:get/get.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:book_sharing_app/model/user.dart';
@@ -15,6 +16,7 @@ void main() async {
 
   Hive.registerAdapter(UserAdapter());
   runApp(const MyApp());
+  configLoading();
 }
 
 class MyApp extends StatelessWidget {
@@ -25,6 +27,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return GetMaterialApp(
       title: "Let's Share Books",
+      builder: EasyLoading.init(),
       debugShowCheckedModeBanner: false,
       defaultTransition: Transition.zoom,
       initialRoute: "/",
@@ -37,4 +40,20 @@ class MyApp extends StatelessWidget {
       ],
     );
   }
+}
+
+void configLoading() {
+  EasyLoading.instance
+    ..displayDuration = const Duration(milliseconds: 2000)
+    ..indicatorType = EasyLoadingIndicatorType.cubeGrid
+    ..loadingStyle = EasyLoadingStyle.custom
+    ..indicatorSize = 45.0
+    ..radius = 10.0
+    ..progressColor = Colors.yellow
+    ..backgroundColor = Colors.white
+    ..indicatorColor = Colors.green
+    ..textColor = Colors.green
+    ..maskColor = Colors.blue.withOpacity(0.5)
+    ..userInteractions = false
+    ..dismissOnTap = false;
 }

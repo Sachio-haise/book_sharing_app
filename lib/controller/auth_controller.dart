@@ -1,4 +1,5 @@
 import 'package:book_sharing_app/model/user.dart';
+import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:hive/hive.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'dart:io';
@@ -16,6 +17,8 @@ import 'package:book_sharing_app/constants/env.dart';
 class AuthenticationController extends GetxController {
   final isLoading = false.obs;
   final isUpdating = false.obs;
+  String? profileImage;
+  User? user;
   Map<String, dynamic> validationErrors = {
     'name': '',
     'password': '',
@@ -25,7 +28,14 @@ class AuthenticationController extends GetxController {
     'reset_code': ''
   }.obs;
 
+  Future<void> fetchUserData() async {
+    final userData = await getUser();
+
+    update();
+  }
+
   Future<User> getUser() async {
+    await EasyLoading.show();
     try {
       final SharedPreferences prefs = await SharedPreferences.getInstance();
       final String? token = prefs.getString('token');
@@ -40,15 +50,18 @@ class AuthenticationController extends GetxController {
         },
       );
       print("getUser - Status Code: ${response.statusCode}");
-
+      EasyLoading.dismiss();
       if (response.statusCode == 200) {
         // Successfully fetched user data
         final dynamic data = json.decode(response.body);
         final dynamic userData = data['data'];
         print("getUser - User Data: $userData");
 
-        final User user = User.fromJson(userData);
-        return user;
+        final User userModel = User.fromJson(userData);
+        user = userModel;
+        profileImage = userModel.profile?.public_path ?? '';
+        update();
+        return userModel;
         // You can now handle the user data as needed
         // For example, storing it in a Hive box
         // final userBox = await Hive.openBox('user');
@@ -86,6 +99,7 @@ class AuthenticationController extends GetxController {
     required String password,
     required bool isSignIn,
   }) async {
+    await EasyLoading.show();
     try {
       if (isLoading.value) return;
       debugPrint("submit");
@@ -107,16 +121,16 @@ class AuthenticationController extends GetxController {
       if (!isSignIn) validationErrors['name'] = '';
       validationErrors['email'] = '';
       validationErrors['password'] = '';
+      EasyLoading.dismiss();
       if (response.statusCode == 200 || response.statusCode == 201) {
         var decodedData = json.decode(responseBody);
         if (decodedData.containsKey('token')) {
           debugPrint(decodedData['token']);
-          SharedPreferences.setMockInitialValues({});
           final SharedPreferences prefs = await SharedPreferences.getInstance();
 
           // Save an String value to 'action' key.
           await prefs.setString('token', decodedData['token']);
-          Get.toNamed('/');
+          Get.offAllNamed('/');
         }
         isLoading.value = false;
       } else {
@@ -132,6 +146,7 @@ class AuthenticationController extends GetxController {
         }
       }
     } catch (e) {
+      EasyLoading.dismiss();
       isLoading.value = false;
       if (kDebugMode) {
         print(e);
@@ -144,6 +159,7 @@ class AuthenticationController extends GetxController {
     required String oldPassword,
     required String password,
   }) async {
+    await EasyLoading.show();
     if (isUpdating.value) return;
     debugPrint("submit");
     try {
@@ -167,7 +183,7 @@ class AuthenticationController extends GetxController {
         },
         body: data,
       );
-
+      EasyLoading.dismiss();
       var responseBody = response.body;
       validationErrors['old_password'] = '';
       validationErrors['password'] = '';
@@ -197,6 +213,7 @@ class AuthenticationController extends GetxController {
       return response.statusCode;
     } catch (e) {
       print(e);
+      EasyLoading.dismiss();
       isUpdating.value = false;
       return 500;
     }
@@ -211,6 +228,7 @@ class AuthenticationController extends GetxController {
     if (isLoading.value) return;
     debugPrint("submit");
     try {
+      await EasyLoading.show();
       isLoading.value = true;
 
       final SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -232,7 +250,7 @@ class AuthenticationController extends GetxController {
         },
         body: data,
       );
-
+      EasyLoading.dismiss();
       var responseBody = response.body;
       validationErrors['name'] = '';
       validationErrors['email'] = '';
@@ -262,6 +280,7 @@ class AuthenticationController extends GetxController {
       return response.statusCode;
     } catch (e) {
       print(e);
+      EasyLoading.dismiss();
       isLoading.value = false;
       return 500;
     }
@@ -270,6 +289,7 @@ class AuthenticationController extends GetxController {
   Future forgetPassword({
     required String email,
   }) async {
+    await EasyLoading.show();
     if (isLoading.value) return;
     debugPrint("submit");
     try {
@@ -286,7 +306,7 @@ class AuthenticationController extends GetxController {
         },
         body: data,
       );
-
+      EasyLoading.dismiss();
       var responseBody = response.body;
       print(responseBody);
       validationErrors['email'] = '';
@@ -314,6 +334,7 @@ class AuthenticationController extends GetxController {
     } catch (e) {
       print(e);
       isLoading.value = false;
+      EasyLoading.dismiss();
       return {
         'status': "500",
       };
@@ -337,6 +358,7 @@ class AuthenticationController extends GetxController {
       {required String email,
       required String password,
       required String passwordConfirmation}) async {
+    await EasyLoading.show();
     if (isLoading.value) return;
     debugPrint("submit");
     try {
@@ -357,6 +379,7 @@ class AuthenticationController extends GetxController {
         body: data,
       );
 
+      EasyLoading.dismiss();
       var responseBody = response.body;
       validationErrors['password'] = '';
       validationErrors['password_confirmation'] = '';
@@ -384,6 +407,7 @@ class AuthenticationController extends GetxController {
       }
     } catch (e) {
       print(e);
+      EasyLoading.dismiss();
       isLoading.value = false;
       return {
         'status': "500",
@@ -407,9 +431,10 @@ class AuthenticationController extends GetxController {
     request.fields['id'] = id ?? '';
     request.headers['Authorization'] = 'Bearer $token';
     request.files.add(multipartFile);
-
+    await EasyLoading.show();
     try {
       var response = await request.send();
+      EasyLoading.dismiss();
       if (response.statusCode == 200) {
         print('File uploaded successfully');
       } else {
@@ -417,6 +442,7 @@ class AuthenticationController extends GetxController {
       }
       return response.statusCode;
     } catch (error) {
+      EasyLoading.dismiss();
       print('Error during file upload: $error');
       return 500;
     }

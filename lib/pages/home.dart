@@ -1,9 +1,12 @@
 import 'dart:async';
+import 'package:book_sharing_app/pages/profile.dart';
 import 'package:book_sharing_app/widgets/books_list.dart';
 import 'package:book_sharing_app/widgets/card_scroll.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+
+import '../controller/home_controller.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -13,21 +16,15 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
+  final _homeController = Get.put(HomeController());
+  final pageController = PageController();
   int currentPageIndex = 0;
   String? _token;
 
   @override
   void initState() {
     super.initState();
-    _loadToken();
-  }
-
-  Future<void> _loadToken() async {
-    final SharedPreferences prefs = await SharedPreferences.getInstance();
-    final String? token = prefs.getString('token');
-    setState(() {
-      _token = token; // No need for null check here
-    });
+    _homeController.loadToken();
   }
 
   @override
@@ -50,13 +47,7 @@ class _HomePageState extends State<HomePage> {
           Padding(
             padding: const EdgeInsets.only(right: 16.0, top: 8.0),
             child: InkWell(
-              onTap: () {
-                if (_token != null && _token!.isNotEmpty) {
-                  Get.offAllNamed('/profile');
-                } else {
-                  Get.toNamed('/auth');
-                }
-              },
+              onTap: _homeController.authenticate,
               child: const CircleAvatar(
                 radius: 20,
                 backgroundImage:
@@ -67,94 +58,94 @@ class _HomePageState extends State<HomePage> {
         ],
         toolbarHeight: kToolbarHeight + 20,
       ),
-      body: Column(
+      body: PageView(
+        controller: pageController,
+        physics: const NeverScrollableScrollPhysics(),
         children: [
-          Container(
-              margin: const EdgeInsets.only(top: 20.0),
-              padding: const EdgeInsets.only(left: 20.0, right: 20.0),
-              alignment: Alignment.topLeft,
-              child: Row(
-                children: [
-                  const Text(
-                    'Popular',
-                    style: TextStyle(
-                        color: Colors.black,
-                        fontSize: 20,
-                        fontWeight: FontWeight.bold),
-                  ),
-                  const SizedBox(
-                    width: 10,
-                  ),
-                  const Icon(
-                    Icons.star,
-                    color: Colors.yellow,
-                  ),
-                  const Spacer(),
-                  InkWell(
-                    onTap: () {
-                      if (_token != null && _token!.isNotEmpty) {
-                        Get.offAllNamed('/book_lists');
-                      } else {
-                        Get.toNamed('/auth');
-                      }
-                    },
-                    child: const Text(
-                      'See All',
-                      style: TextStyle(
-                          color: Colors.green,
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold),
-                    ),
-                  ),
-                ],
-              )),
-          Container(
-            margin: const EdgeInsets.only(top: 20.0),
-            height: 285,
-            child: const CardRow(),
-          ),
+          Column(
+            children: [
+              Container(
+                  margin: const EdgeInsets.only(top: 20.0),
+                  padding: const EdgeInsets.only(left: 20.0, right: 20.0),
+                  alignment: Alignment.topLeft,
+                  child: Row(
+                    children: [
+                      const Text(
+                        'Popular',
+                        style: TextStyle(
+                            color: Colors.black,
+                            fontSize: 20,
+                            fontWeight: FontWeight.bold),
+                      ),
+                      const SizedBox(
+                        width: 10,
+                      ),
+                      const Icon(
+                        Icons.star,
+                        color: Colors.yellow,
+                      ),
+                      const Spacer(),
+                      InkWell(
+                        onTap: _homeController.authenticate,
+                        child: const Text(
+                          'See All',
+                          style: TextStyle(
+                              color: Colors.green,
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold),
+                        ),
+                      ),
+                    ],
+                  )),
+              const SizedBox(
+                height: 285,
+                child: CardRow(),
+              ),
 
-          //All Books
-          Container(
-              // margin: const EdgeInsets.only(top: 20.0),
-              padding: const EdgeInsets.only(left: 20.0, right: 20.0),
-              alignment: Alignment.topLeft,
-              child: Row(
-                children: [
-                  const Text(
-                    'All Books',
-                    style: TextStyle(
-                        color: Colors.black,
-                        fontSize: 20,
-                        fontWeight: FontWeight.bold),
-                  ),
-                  const SizedBox(
-                    width: 10,
-                  ),
-                  const Icon(
-                    Icons.book,
-                    color: Colors.green,
-                  ),
-                  const Spacer(),
-                  InkWell(
-                    onTap: () {
-                      if (_token != null && _token!.isNotEmpty) {
-                        Get.offAllNamed('/book_lists');
-                      } else {
-                        Get.toNamed('/auth');
-                      }
-                    },
-                    child: const Text(
-                      'See All',
-                      style: TextStyle(
-                          color: Colors.green,
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold),
-                    ),
-                  ),
-                ],
-              )),
-          Books()
+              //All Books
+              Container(
+                  // margin: const EdgeInsets.only(top: 20.0),
+                  padding: const EdgeInsets.only(left: 20.0, right: 20.0),
+                  alignment: Alignment.topLeft,
+                  child: Row(
+                    children: [
+                      const Text(
+                        'All Books',
+                        style: TextStyle(
+                            color: Colors.black,
+                            fontSize: 20,
+                            fontWeight: FontWeight.bold),
+                      ),
+                      const SizedBox(
+                        width: 10,
+                      ),
+                      const Icon(
+                        Icons.book,
+                        color: Colors.green,
+                      ),
+                      const Spacer(),
+                      InkWell(
+                        onTap: () {
+                          if (_token != null && _token!.isNotEmpty) {
+                            Get.offAllNamed('/book_lists');
+                          } else {
+                            Get.toNamed('/auth');
+                          }
+                        },
+                        child: const Text(
+                          'See All',
+                          style: TextStyle(
+                              color: Colors.green,
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold),
+                        ),
+                      ),
+                    ],
+                  )),
+              const Books()
+            ],
+          ),
+          const ProfilePage(),
         ],
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
@@ -163,11 +154,10 @@ class _HomePageState extends State<HomePage> {
           borderRadius: BorderRadius.circular(50),
         ),
         backgroundColor: Colors.green,
-        onPressed: () {
-          if (_token != null && _token!.isNotEmpty) {
-            Get.offAllNamed('/upload', arguments: _token);
-          } else {
-            Get.toNamed('/auth');
+        onPressed: () async {
+          final value = await _homeController.navigateToBookCreatePage();
+          if (value != null || value) {
+            _homeController.authenticate();
           }
         },
         child: const Icon(
@@ -176,6 +166,7 @@ class _HomePageState extends State<HomePage> {
         ),
       ),
       bottomNavigationBar: BottomAppBar(
+        color: Colors.green.shade50,
         shape: const CircularNotchedRectangle(),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceAround,
@@ -184,57 +175,67 @@ class _HomePageState extends State<HomePage> {
               onPressed: () {
                 setState(() {
                   currentPageIndex = 0;
+                  pageController.animateToPage(
+                    currentPageIndex,
+                    duration: const Duration(milliseconds: 400),
+                    curve: Curves.easeInOut,
+                  );
                 });
               },
               icon: Icon(
-                Icons.home_outlined,
+                Icons.home_rounded,
                 color: currentPageIndex == 0 ? Colors.green : Colors.grey,
                 size: currentPageIndex == 0
                     ? 30
-                    : 24, // Increase icon size when selected
+                    : 26, // Increase icon size when selected
               ),
             ),
+            // IconButton(
+            //   onPressed: () {
+            //     setState(() {
+            //       currentPageIndex = 1;
+            //     });
+            //   },
+            //   icon: Icon(
+            //     Icons.search_outlined,
+            //     color: currentPageIndex == 1 ? Colors.green : Colors.grey,
+            //     size: currentPageIndex == 1
+            //         ? 30
+            //         : 24, // Increase icon size when selected
+            //   ),
+            // ),
+            SizedBox(width: 48), // Empty space for the FAB
+            // IconButton(
+            //   onPressed: () {
+            //     setState(() {
+            //       currentPageIndex = 2;
+            //     });
+            //   },
+            //   icon: Icon(
+            //     Icons.menu_book_outlined,
+            //     color: currentPageIndex == 2 ? Colors.green : Colors.grey,
+            //     size: currentPageIndex == 2
+            //         ? 30
+            //         : 24, // Increase icon size when selected
+            //   ),
+            // ),
             IconButton(
               onPressed: () {
                 setState(() {
                   currentPageIndex = 1;
+                  pageController.animateToPage(
+                    currentPageIndex,
+                    duration: const Duration(milliseconds: 400),
+                    curve: Curves.easeInOut,
+                  );
                 });
               },
               icon: Icon(
-                Icons.search_outlined,
+                Icons.account_circle,
                 color: currentPageIndex == 1 ? Colors.green : Colors.grey,
                 size: currentPageIndex == 1
                     ? 30
-                    : 24, // Increase icon size when selected
-              ),
-            ),
-            SizedBox(width: 48), // Empty space for the FAB
-            IconButton(
-              onPressed: () {
-                setState(() {
-                  currentPageIndex = 2;
-                });
-              },
-              icon: Icon(
-                Icons.menu_book_outlined,
-                color: currentPageIndex == 2 ? Colors.green : Colors.grey,
-                size: currentPageIndex == 2
-                    ? 30
-                    : 24, // Increase icon size when selected
-              ),
-            ),
-            IconButton(
-              onPressed: () {
-                setState(() {
-                  currentPageIndex = 3;
-                });
-              },
-              icon: Icon(
-                Icons.settings_outlined,
-                color: currentPageIndex == 3 ? Colors.green : Colors.grey,
-                size: currentPageIndex == 3
-                    ? 30
-                    : 24, // Increase icon size when selected
+                    : 26, // Increase icon size when selected
               ),
             ),
           ],

@@ -2,6 +2,7 @@ import 'dart:io';
 import 'dart:async';
 
 import 'package:book_sharing_app/constants/env.dart';
+import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:path/path.dart';
@@ -47,8 +48,10 @@ class Book {
 
   //Get all books
   static Future<List<Book>> getAllBooks() async {
+    await EasyLoading.show();
     final response = await http.get(Uri.parse('$baseUrl/books'),
         headers: {'Accept': 'application/json'});
+    EasyLoading.dismiss();
     if (response.statusCode == 200) {
       var data = json.decode(response.body);
       List<Book> books = [];
@@ -64,22 +67,20 @@ class Book {
 
   //Create Book
   static Future createBook(
-      {
-      required String userId,
+      {required String userId,
       required String name,
       required String description,
       required String review,
       required File photo,
       required File book,
-      required String status
-      }
-      ) async {
+      required String status}) async {
     try {
+      await EasyLoading.show();
       final SharedPreferences prefs = await SharedPreferences.getInstance();
       final String? token = prefs.getString('token');
 
-      var request = http.MultipartRequest(
-          'POST', Uri.parse('$baseUrl/add-book'));
+      var request =
+          http.MultipartRequest('POST', Uri.parse('$baseUrl/add-book'));
       var stream = http.ByteStream(Stream.castFrom(photo.openRead()));
       var length = await photo.length();
       var multipartFile = http.MultipartFile('photo', stream, length,
@@ -101,6 +102,8 @@ class Book {
       request.files.add(multipartFile2);
       var response = await request.send();
       var responseData = await http.Response.fromStream(response);
+
+      EasyLoading.dismiss();
       if (response.statusCode == 201) {
         var data = json.decode(responseData.body);
         Book book = Book.fromJson(data['data']);
@@ -110,7 +113,8 @@ class Book {
         throw Exception('Failed to create book');
       }
       print("hel ${response.statusCode}");
-    }catch(e){
+    } catch (e) {
+      EasyLoading.dismiss();
       print(e);
       return 500;
     }
@@ -133,8 +137,10 @@ class Book {
       'book': book,
       'status': status
     };
+    await EasyLoading.show();
     final response = await http.put(Uri.parse('$baseUrl/update-book/$id'),
         headers: {'Accept': 'application/json'}, body: json.encode(data));
+    EasyLoading.dismiss();
     if (response.statusCode == 200) {
       var data = json.decode(response.body);
       Book book = Book.fromJson(data['data']);
@@ -146,8 +152,10 @@ class Book {
 
   //Delete Book
   static Future<Book> deleteBook({required String id}) async {
+    await EasyLoading.show();
     final response = await http.delete(Uri.parse('$baseUrl/delete-book/$id'),
         headers: {'Accept': 'application/json'});
+    EasyLoading.dismiss();
     if (response.statusCode == 200) {
       var data = json.decode(response.body);
       Book book = Book.fromJson(data['data']);

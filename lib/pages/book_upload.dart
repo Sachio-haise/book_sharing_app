@@ -7,7 +7,6 @@ import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:book_sharing_app/controller/auth_controller.dart';
 
-
 class BookCreatePage extends StatefulWidget {
   const BookCreatePage({Key? key}) : super(key: key);
 
@@ -19,7 +18,8 @@ class _BookCreatePageState extends State<BookCreatePage> {
   TextEditingController nameController = TextEditingController();
   TextEditingController descriptionController = TextEditingController();
   TextEditingController reviewController = TextEditingController();
-  final AuthenticationController _authenticationController = Get.find();
+  final AuthenticationController _authenticationController =
+      Get.put(AuthenticationController());
   String? profileImage;
   File? _photo;
   File? _book;
@@ -70,7 +70,31 @@ class _BookCreatePageState extends State<BookCreatePage> {
     }
   }
 
-  Future<void> _uploadBookFile() async {
+  _showSuccessSnackBar(BuildContext context) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: const Text(
+          'Book uploaded successfully!',
+          style: TextStyle(color: Colors.green),
+        ),
+        backgroundColor: Colors.green.shade100,
+      ),
+    );
+  }
+
+  _showErrorSnackBar(BuildContext context) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: const Text(
+          'Error occurred!',
+          style: TextStyle(color: Colors.red),
+        ),
+        backgroundColor: Colors.red.shade100,
+      ),
+    );
+  }
+
+  Future<void> _uploadBookFile(BuildContext context) async {
     //apicall
     try {
       final res = await Book.createBook(
@@ -81,8 +105,12 @@ class _BookCreatePageState extends State<BookCreatePage> {
           photo: _photo!,
           book: _book!,
           status: status.toString());
+      if (res != null) {
+        _showSuccessSnackBar(context);
+      }
       print("we got the result ${res}");
     } catch (e) {
+      _showErrorSnackBar(context);
       print(e);
     }
   }
@@ -99,12 +127,13 @@ class _BookCreatePageState extends State<BookCreatePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+          backgroundColor: Colors.grey[200],
           centerTitle: true,
           title: const Text('Book Upload'),
           leading: IconButton(
               icon: const Icon(Icons.arrow_back),
               onPressed: () {
-                Get.offAllNamed('/');
+                Get.back(result: true);
               })),
       body: SingleChildScrollView(
         scrollDirection: Axis.vertical,
@@ -114,12 +143,21 @@ class _BookCreatePageState extends State<BookCreatePage> {
             children: [
               Container(
                 alignment: Alignment.topRight,
-                child: Text(user?.name ?? "",
-                    style: const TextStyle(
-                      color: Colors.black,
-                      fontSize: 12,
-                      fontWeight: FontWeight.bold,
-                    )),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(Icons.account_circle),
+                    const SizedBox(width: 10),
+                    Text(
+                      user?.name ?? "",
+                      style: const TextStyle(
+                        color: Colors.black,
+                        fontSize: 12,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ],
+                ),
               ),
               TextField(
                 controller: nameController,
@@ -143,7 +181,7 @@ class _BookCreatePageState extends State<BookCreatePage> {
               GestureDetector(
                 onTap: _uploadPhoto,
                 child: Container(
-                    margin: const EdgeInsets.all(8.0),
+                    margin: const EdgeInsets.symmetric(vertical: 8.0),
                     height: 150,
                     width: MediaQuery.sizeOf(context).width,
                     decoration: BoxDecoration(
@@ -192,7 +230,6 @@ class _BookCreatePageState extends State<BookCreatePage> {
                   }
                 },
                 child: Container(
-                  margin: const EdgeInsets.all(8.0),
                   height: 100,
                   width: MediaQuery.sizeOf(context).width,
                   decoration: BoxDecoration(
@@ -248,12 +285,15 @@ class _BookCreatePageState extends State<BookCreatePage> {
                   ],
                 ),
               ),
-              ElevatedButton(
-                onPressed: () async {
-                  await _uploadBookFile();
-                },
-                child: const Text('Upload Book',
-                    style: TextStyle(fontSize: 20, color: Colors.green)),
+              SizedBox(
+                width: double.maxFinite,
+                child: ElevatedButton(
+                  onPressed: () async {
+                    await _uploadBookFile(context);
+                  },
+                  child: const Text('Upload Book',
+                      style: TextStyle(color: Colors.green)),
+                ),
               ),
             ],
           ),
