@@ -11,11 +11,23 @@ import '../model/book.dart';
 
 class BookController extends GetxController {
   final isInProcess = false.obs;
+  var message = "";
   RxList<Book> books = <Book>[].obs;
+  RxList<Book> carts = <Book>[].obs;
   RxList<Book> bookByAuthor = <Book>[].obs;
-  Future<void> loadBooks() async {
-    List<Book> fetchedBooks = await Book.getAllBooks();
+
+  Future<void> loadBooks(
+  {
+    required bool load
+}
+      ) async {
+    List<Book> fetchedBooks = await Book.getAllBooks(load:load);
     books.value = fetchedBooks;
+  }
+
+  Future<void> loadCart({required String userId}) async {
+    List<Book> fetchedCarts = await getCarts(userId: userId);
+    carts.value = fetchedCarts;
   }
 
   void findBooksByAuthor(String author) {
@@ -26,7 +38,7 @@ class BookController extends GetxController {
         .toList();
   }
 
-  Future saveBook({required String userId, required String bookId}) async {
+  Future saveBook( String userId, String bookId, BuildContext context) async {
     if (isInProcess.value) return;
     isInProcess.value = true;
     try {
@@ -37,6 +49,37 @@ class BookController extends GetxController {
       final data = {'user_id': userId, 'book_id': bookId};
 
       final response = await http.post(Uri.parse("$baseUrl/add-to-cart"),
+          headers: {
+            'Accept': 'application/json',
+            'Authorization': "Bearer $token",
+          },
+          body: data
+      );
+      final responseBody = response.body;
+      final decodedResponse = json.decode(responseBody);
+
+      message = decodedResponse['message'];
+      _showSuccessSnackBar(context);
+      isInProcess.value = false;
+      return response.statusCode;
+    } catch (e) {
+      print(e);
+      isInProcess.value = false;
+      return 500;
+    }
+  }
+
+  Future reactBook({required String userId, required String bookId}) async {
+    if (isInProcess.value) return;
+    isInProcess.value = true;
+    try {
+      final SharedPreferences prefs = await SharedPreferences.getInstance();
+      final String? token = prefs.getString('token');
+      print(token);
+
+      final data = {'user_id': userId, 'book_id': bookId};
+
+      final response = await http.post(Uri.parse("$baseUrl/react-book"),
           headers: {
             'Accept': 'application/json',
             'Authorization': "Bearer $token",
@@ -55,9 +98,9 @@ class BookController extends GetxController {
   _showSuccessSnackBar(BuildContext context) {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: const Text(
-          'Book uploaded successfully!',
-          style: TextStyle(color: Colors.green),
+        content: Text(
+          message,
+          style: const TextStyle(color: Colors.green),
         ),
         backgroundColor: Colors.green.shade100,
       ),
@@ -76,6 +119,42 @@ class BookController extends GetxController {
     );
   }
 
+  Future removeFromCart(String id, String author, BuildContext context) async{
+    await EasyLoading.show();
+    try{
+      final SharedPreferences prefs = await SharedPreferences.getInstance();
+      final String? token = prefs.getString('token');
+
+      final data = {
+        "user_id": author,
+        "book_id":id
+      };
+      final response = await http.post(
+        Uri.parse("$baseUrl/add-to-cart"),
+        headers: {
+          'Accept': 'application/json',
+          'Authorization': "Bearer $token",
+        },
+        body:data
+      );
+      EasyLoading.dismiss();
+      final responseBody = response.body;
+      if (responseBody.isNotEmpty) {
+        await loadCart(userId: author);
+        findBooksByAuthor(author);
+        message = "Book Unsaved successfully!";
+        _showSuccessSnackBar(context);
+      }
+      final decodedData = json.decode(responseBody);
+      print(decodedData['data']);
+    }catch (e) {
+      _showErrorSnackBar(context);
+      EasyLoading.dismiss();
+      print(e);
+      return 500;
+    }
+  }
+
   Future deleteBook(String id, String author, BuildContext context) async {
     await EasyLoading.show();
     try {
@@ -92,8 +171,9 @@ class BookController extends GetxController {
       EasyLoading.dismiss();
       final responseBody = response.body;
       if (responseBody.isNotEmpty) {
-        await loadBooks();
+        await loadBooks(load: true);
         findBooksByAuthor(author);
+        message = "Book deleted successfully!";
         _showSuccessSnackBar(context);
       }
       final decodedData = json.decode(responseBody);
@@ -127,6 +207,43 @@ class BookController extends GetxController {
       final decodedData = json.decode(responseBody);
       print(decodedData['data']);
       return decodedData['data'];
+    } catch (e) {
+      print(e);
+      return 500;
+    }
+  }
+
+  Future getCarts({required String userId}) async {
+    try {
+      final SharedPreferences prefs = await SharedPreferences.getInstance();
+      final String? token = prefs.getString('token');
+      print(token);
+
+      final data = {'user_id': userId};
+
+      final response = await http.post(Uri.parse("$baseUrl/cart"),
+          headers: {
+            'Accept': 'application/json',
+            'Authorization': "Bearer $token",
+          },
+          body: data);
+      print(response.statusCode);
+
+      if (response.statusCode == 200) {
+        var data = json.decode(response.body);
+        List<Book> books = [];
+        for (var bookData in data['data']) {
+          print('heler book ddata');
+          print(bookData);
+          print('heler book ddata');
+
+          Book book = Book.fromJson(bookData['book']);
+          books.add(book);
+        }
+        return books;
+      } else {
+        throw Exception('Failed to load books');
+      }
     } catch (e) {
       print(e);
       return 500;

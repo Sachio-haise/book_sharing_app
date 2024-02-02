@@ -22,6 +22,7 @@ class BookDetails extends StatefulWidget {
     required this.description,
     required this.author,
     required this.pdf,
+    required this.authorProfile
   });
 
   final Photo image;
@@ -30,6 +31,7 @@ class BookDetails extends StatefulWidget {
   final String description;
   final String author;
   final BookFile pdf;
+  final String authorProfile;
   @override
   State<BookDetails> createState() => _BookDetailsState();
 }
@@ -85,8 +87,10 @@ class _BookDetailsState extends State<BookDetails> {
       isInCart = !isInCart;
     });
     final res = await _bookController.saveBook(
-        userId: "${user?.id}", bookId: widget.id);
+       "${user?.id}", widget.id, context
+    );
     await _getBookInfo();
+
     print("this is book info $res");
   }
 
@@ -105,7 +109,8 @@ class _BookDetailsState extends State<BookDetails> {
                 onPressed: () {
                   _token != null ? _saveBook() : Get.toNamed('/auth');
                 },
-              ))
+              )
+          )
         ],
       ),
       body: SingleChildScrollView(
@@ -161,8 +166,14 @@ class _BookDetailsState extends State<BookDetails> {
                   children: [
                     Row(
                       children: [
-                        const Icon(
-                          Icons.account_circle,
+                        CircleAvatar(
+                          foregroundImage: widget.authorProfile !=
+                              null
+                              ? NetworkImage(
+                              widget.authorProfile)
+                              : const NetworkImage(
+                              "https://img6.arthub.ai/6497fccf-d831.webp"),
+                          minRadius: 10.0,
                         ),
                         const SizedBox(width: 10),
                         Text(
@@ -188,7 +199,7 @@ class _BookDetailsState extends State<BookDetails> {
                 padding: const EdgeInsets.only(left: 24.0, right: 24.0),
                 child: SizedBox(
                   child: ReadMoreText(
-                    "${widget.description}\n\nTry To Download this pdf to save in the user phone'.\n ${widget.pdf.publicPath}",
+                    "${widget.description}",
                     trimLines: 5,
                     textAlign: TextAlign.justify,
                     trimMode: TrimMode.Line,

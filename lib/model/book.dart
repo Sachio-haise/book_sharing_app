@@ -19,6 +19,8 @@ class Book {
   BookFile book;
   User user;
   int reactions;
+  List<dynamic> carts;
+  List<dynamic> react_user;
 
   Book({
     required this.id,
@@ -30,6 +32,8 @@ class Book {
     required this.book,
     required this.user,
     required this.reactions,
+    required this.carts,
+    required this.react_user,
   });
 
   factory Book.fromJson(Map<String, dynamic> json) {
@@ -43,15 +47,19 @@ class Book {
       book: BookFile.fromJson(json['book']),
       user: User.fromJson(json['user']),
       reactions: json['reactions'],
+      react_user: json['react_user'],
+      carts: json['carts'],
     );
   }
 
   //Get all books
-  static Future<List<Book>> getAllBooks() async {
-    await EasyLoading.show();
+  static Future<List<Book>> getAllBooks({
+    required bool load
+   }) async {
+    if(load) await EasyLoading.show();
     final response = await http.get(Uri.parse('$baseUrl/books'),
         headers: {'Accept': 'application/json'});
-    EasyLoading.dismiss();
+    if(load) EasyLoading.dismiss();
     if (response.statusCode == 200) {
       var data = json.decode(response.body);
       List<Book> books = [];

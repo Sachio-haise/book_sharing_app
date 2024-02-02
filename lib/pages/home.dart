@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:book_sharing_app/controller/auth_controller.dart';
 import 'package:book_sharing_app/pages/profile.dart';
 import 'package:book_sharing_app/widgets/books_list.dart';
 import 'package:book_sharing_app/widgets/card_scroll.dart';
@@ -19,12 +20,18 @@ class _HomePageState extends State<HomePage> {
   final _homeController = Get.put(HomeController());
   final pageController = PageController();
   int currentPageIndex = 0;
+  final AuthenticationController _authenticationController = Get.put(AuthenticationController());
   String? _token;
 
   @override
   void initState() {
     super.initState();
     _homeController.loadToken();
+  }
+
+  Future setUserInfoNav() async {
+    await _authenticationController.fetchUserData();
+    print("authentication ${_authenticationController.user?.name}");
   }
 
   @override
@@ -48,10 +55,14 @@ class _HomePageState extends State<HomePage> {
             padding: const EdgeInsets.only(right: 16.0, top: 8.0),
             child: InkWell(
               onTap: _homeController.authenticate,
-              child: const CircleAvatar(
-                radius: 20,
-                backgroundImage:
-                    NetworkImage("https://img6.arthub.ai/6497fccf-d831.webp"),
+              child: CircleAvatar(
+                foregroundImage: _authenticationController.profileImage !=
+                    null
+                    ? NetworkImage(
+                    "${_authenticationController.profileImage}")
+                    : const NetworkImage(
+                    "https://img6.arthub.ai/6497fccf-d831.webp"),
+                minRadius: 18.0,
               ),
             ),
           )

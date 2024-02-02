@@ -36,13 +36,14 @@ class _CardRowState extends State<CardRow> {
             rating: book.reactions,
             pressDetails: () {
               //go to book details page
-              Navigator.pushNamed(context, '/book_details', arguments: book);
+              // Navigator.pushNamed(context, '/book_details', arguments: book);
               Get.to(BookDetails(
                 id: book.id,
                 image: book.photo,
                 title: book.name,
                 description: book.description,
                 author: book.user.name ?? "",
+                authorProfile: book.user.profile?.public_path ?? "",
                 pdf: book.book,
               ));
             },
