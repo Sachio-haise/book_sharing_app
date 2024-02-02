@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'package:book_sharing_app/controller/book_controller.dart';
 import 'package:book_sharing_app/model/book.dart';
 import 'package:book_sharing_app/model/user.dart';
 import 'package:file_picker/file_picker.dart';
@@ -18,6 +19,7 @@ class _BookCreatePageState extends State<BookCreatePage> {
   TextEditingController nameController = TextEditingController();
   TextEditingController descriptionController = TextEditingController();
   TextEditingController reviewController = TextEditingController();
+  final BookController _bookController = Get.put(BookController());
   final AuthenticationController _authenticationController =
       Get.put(AuthenticationController());
   String? profileImage;
@@ -95,7 +97,6 @@ class _BookCreatePageState extends State<BookCreatePage> {
   }
 
   Future<void> _uploadBookFile(BuildContext context) async {
-    //apicall
     try {
       final res = await Book.createBook(
           userId: user!.id.toString(),
@@ -104,10 +105,13 @@ class _BookCreatePageState extends State<BookCreatePage> {
           review: reviewController.text,
           photo: _photo!,
           book: _book!,
-          status: status.toString());
+          status: '0');
       if (res != null) {
         _showSuccessSnackBar(context);
       }
+      await _bookController.loadBooks(load: true);
+      Get.toNamed('/');
+
       print("we got the result ${res}");
     } catch (e) {
       _showErrorSnackBar(context);
@@ -258,33 +262,34 @@ class _BookCreatePageState extends State<BookCreatePage> {
                         ),
                 ),
               ),
-              ListTile(
-                title: const Text('Status'),
-                subtitle: Row(
-                  children: [
-                    Radio<int>(
-                      value: 0,
-                      groupValue: int.parse(status.toString()),
-                      onChanged: (value) {
-                        setState(() {
-                          status = value!;
-                        });
-                      },
-                    ),
-                    const Text('Private'),
-                    Radio<int>(
-                      value: 1,
-                      groupValue: int.parse(status.toString()),
-                      onChanged: (value) {
-                        setState(() {
-                          status = value!;
-                        });
-                      },
-                    ),
-                    const Text('Public'),
-                  ],
-                ),
-              ),
+              // ListTile(
+              //   title: const Text('Status'),
+              //   subtitle: Row(
+              //     children: [
+              //       Radio<int>(
+              //         value: 0,
+              //         groupValue: int.parse(status.toString()),
+              //         onChanged: (value) {
+              //           setState(() {
+              //             status = value!;
+              //           });
+              //         },
+              //       ),
+              //       const Text('Private'),
+              //       Radio<int>(
+              //         value: 1,
+              //         groupValue: int.parse(status.toString()),
+              //         onChanged: (value) {
+              //           setState(() {
+              //             status = value!;
+              //           });
+              //         },
+              //       ),
+              //       const Text('Public'),
+              //     ],
+              //   ),
+              // ),
+              const SizedBox(height: 15,),
               SizedBox(
                 width: double.maxFinite,
                 child: ElevatedButton(

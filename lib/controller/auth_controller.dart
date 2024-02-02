@@ -1,4 +1,5 @@
 import 'package:book_sharing_app/model/user.dart';
+import 'package:book_sharing_app/pages/home.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:hive/hive.dart';
 import 'package:hive_flutter/hive_flutter.dart';
@@ -29,8 +30,7 @@ class AuthenticationController extends GetxController {
   }.obs;
 
   Future<void> fetchUserData() async {
-    final userData = await getUser();
-
+    await getUser();
     update();
   }
 
@@ -59,7 +59,10 @@ class AuthenticationController extends GetxController {
 
         final User userModel = User.fromJson(userData);
         user = userModel;
+
+
         profileImage = userModel.profile?.public_path ?? '';
+        print(profileImage);
         update();
         return userModel;
         // You can now handle the user data as needed
@@ -451,7 +454,7 @@ class AuthenticationController extends GetxController {
   logout() async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
     await prefs.remove('token');
-    Get.toNamed('/');
+    Get.to(HomePage());
   }
 
   clearErrors() {

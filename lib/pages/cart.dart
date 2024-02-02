@@ -122,14 +122,17 @@ class _BooksState extends State<Carts> {
                       ),
                     ],
                   ),
-                  const Padding(
-                    padding:  EdgeInsets.all(20.0),
+                  Padding(
+                    padding:  const EdgeInsets.all(20.0),
                     child: Column(
                       children: [
-                        Icon(
-                            Icons.delete,
-                          color: Colors.red,
-                        )
+                        IconButton(
+                          icon: const Icon(
+                              Icons.delete,
+                            color: Colors.red,
+                          ),
+                          onPressed: () {},
+                        ),
                       ],
                     ),
                   )
